@@ -1,0 +1,20 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "formules.h"
+
+int main(int argc, char * argv[]){
+  formule f;
+  clause c;
+  var v;
+
+  f = *(creer_formule());
+  c = *(creer_clause());
+  v = *(creer_var());
+
+  push_var(&c,&v);
+  push_clause(&f,&c);
+  afficher_formule(&f);
+
+  liberer_formule(&f);
+  return 0;
+}

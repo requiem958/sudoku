@@ -1,0 +1,152 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "formules.h"
+
+/* Sections formules */
+
+formule* creer_formule(void){
+  formule *f = malloc(sizeof(formule));
+
+  if (f==NULL)
+    return f;
+
+  f->longueur = 0;
+  return f;
+}
+
+bool is_empty_formule(const formule * f){
+  return f == NULL || f->longueur == 0;
+}
+
+void push_clause(formule *f, const clause * c){
+  if (f == NULL || (f = creer_formule()) == NULL){
+    puts("Impossible d'allouer la formule");
+    return;
+  }
+  if (f->longueur == LEN_MAX){
+    puts("Plus de place dans cette formule, augmenter LEN_MAX_F");
+    return;
+  }
+  f->clauses[f->longueur++] = *clause;
+}
+
+void pop_clause(formule *f){
+  if (is_empty_formule(f))
+    return;
+  liberer_clause(f->clauses[--f->longueur]);
+}
+
+void liberer_formule(formule *f){
+  while (!is_empty_formule(f))
+    pop_clause(f);
+  free(f);
+}
+
+void afficher_formule(const formule *f){
+  int i = 1;
+  if (is_empty_formule(f)){
+    puts("Vide");
+  }
+  else{
+    puts("------DEBUT :");
+    afficher_clause(f->clauses[0]);
+    puts("\nET")
+    for (;i < f->longueur-1; i++){
+      afficher_clause(f->clauses[i]);
+      puts("\nET");
+    }
+    afficher_clause(f->clauses[f->longueur-1]);
+    puts("\n------FIN");
+  }
+}
+
+/*Section clauses */
+
+clause * creer_clause(void){
+  clause *c = malloc(sizeof(clause));
+  if (c==NULL)
+    return c;
+  c->longueur = 0;
+  return c;
+}
+
+bool is_empty_clause(const clause * c){
+  return c == NULL || c->longueur == 0;
+}
+
+void push_var(clause *c, const variable * v){
+  if (c == NULL || (c = creer_clause()) == NULL){
+    puts("Impossible d'allouer la clause");
+    return;
+  }
+  if (c->longueur == LEN_MAX){
+    puts("Plus de place dans cette clause, augmenter LEN_MAX_C");
+    return;
+  }
+  c->var[c->longueur++] = *v;
+}
+
+void pop_var(clause * c){
+  if (is_empty_clause(c))
+    return;
+  liberer_var(c->var[--c->longueur]);
+}
+
+void liberer_clause(clause *c){
+  while (!is_empty_clause(c))
+    pop_var(c);
+  free(c);
+}
+
+void afficher_clause(const clause *c){
+  int i = 1;
+  if (is_empty_clause(f)){
+    puts("Vide");
+  }
+  else{
+    afficher_variable(c->var[0]);
+    fputs(stdout,"OU")
+    for (;i < c->longueur-1; i++){
+      afficher_var(c->var[i]);
+      fputs(stdout,"OU");
+    }
+    afficher_variable(c->var[c->longueur-1]);
+    puts("");
+  }
+}
+/*Section variables */
+
+variable * creer_var(void){
+  variable *v = malloc(sizeof(variable));
+  if (v==NULL)
+    return v;
+  v->id = 0;
+  v->neg = FALSE;
+  return v;
+}
+
+bool neg_var(variable * v){
+  if ( v != NULL)
+    return v->neg = (v->neg == FALSE) ? TRUE : FALSE;
+  return FALSE;
+}
+
+int set_var_id(variable *v, const int id){
+  if (v != NULL)
+    return v->id = id;
+  return -1;
+}
+
+void liberer_var(variable *v){
+  if (v != NULL)
+    free(v);
+}
+
+void afficher(const variable * v){
+  if (v==NULL)
+    return;
+
+  if (v->neg)
+    return (void) printf(" NOT( x:%d ) ", v->id);
+  return (void) printf(" x:%d ", v->id);
+}
