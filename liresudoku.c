@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include "sudoku.h"
+#include "liresudoku.h"
 
 //Local function to see if a is a perfect_square = a k*k, k in N
 int is_perfect_square(int a){
