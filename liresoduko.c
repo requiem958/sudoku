@@ -13,7 +13,7 @@ void readsodukofile (FILE *f,soduko *a){
 	for (i=0;i<dim;i++){  // on complete la grille de soduko 
 		for (j=0;j<dim;j++){
 			fscanf(f," %d",&chi);
-			if (chi < 0 || chi > 9){
+			if (chi < 0 || chi > dim){ //Sur un sudoku de taille N on a droit à une valeur entre 1 et N inclus pas juste 9 ;)
 				printf ("la valeur contenue dans la case ( %d , %d  ) Ã  une valeur invalide (%d )\n",i,j,chi);
 			}
 			a->grille[i][j]=chi;
@@ -24,12 +24,12 @@ void readsodukofile (FILE *f,soduko *a){
 void affichergrille (soduko a){
 		int i,j;
 		printf("taille : %d * %d \n",a.taille,a.taille);  //affichage taille
-		for (i=0;i<4;i++){
+		for (i=0;i<a.taille;i++){
 			for(j=0;j<4;j++){
 				printf("%d |",a.grille[i][j]); //affichage valeur 
 			}
 			printf("\n");
-			for(j=0;j<4;j++){
+			for(j=0;j<a.taille;j++){
 				printf("---"); // presentation
 			}
 			printf ("\n");
