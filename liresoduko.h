@@ -4,11 +4,11 @@
 typedef struct { 
 int taille;
 int grille [MAX][MAX];
-} soduko ;
+} sudoku ;
 
-void readsodukofile (FILE *f,soduko *a);
+void readsudokufile (FILE *f,sudoku *a);
 // prend un fichier f ouvert en mode lecture 
-// et un soduko a et rempli le soduko a avec le fichier f
+// et un sudoku a et rempli le soduko a avec le fichier f
 // exemple de fichier
 //4
 // 6 1 0 3
@@ -16,4 +16,4 @@ void readsodukofile (FILE *f,soduko *a);
 // 0 3 4 5
 // 0 9 8 7
 
-void affichergrille (soduko a);
+void affichergrille (sudoku* a);

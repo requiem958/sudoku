@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "soduko.h"
+#include "sudoku.h"
 
 //Local function to see if a is a perfect_square = a k*k, k in N
 int is_perfect_square(int a){
@@ -20,7 +20,7 @@ void readsudokufile (FILE *f,soduko *a){
 	int dim,chi;
 	int i,j;
 	fscanf(f," %d",&dim);
-	if (!(dim <17 && dim>0)){  // verification de la taille 
+	if (!(dim <MAX+1 && dim>0)){  // verification de la taille 
 		printf ("erreur grille de dimension non comprise entre 0 et 16 ");
 		return ;
 	}
@@ -40,17 +40,17 @@ void readsudokufile (FILE *f,soduko *a){
 	}
 }
 
-void affichergrille (soduko a){
+void affichergrille (sudoku* a){
 		int i,j;
-		printf("taille : %d * %d \n",a.taille,a.taille);  //affichage taille
-		for (i=0;i<a.taille;i++){
-			for(j=0;j<4;j++){
-				printf("%d |",a.grille[i][j]); //affichage valeur 
+		printf("taille : %d * %d \n",a->taille,a->taille);  //affichage taille
+		for (i=0;i<a->taille;i++){
+			for(j=0;j<a->taille;j++){
+				printf("%d |",a->grille[i][j]); //affichage valeur 
 			}
 			printf("\n");
-			for(j=0;j<a.taille;j++){
+			for(j=0;j<a->taille;j++){
 				printf("---"); // presentation
 			}
 			printf ("\n");
-	}	
+	}
 }
