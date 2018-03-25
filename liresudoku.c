@@ -15,7 +15,7 @@ int is_perfect_square(int a){
   return -1;
   
 }
-void readsudokufile (FILE *f,soduko *a){
+void readsudokufile (FILE *f,sudoku *a){
 	int dim,chi;
 	int i,j;
 	fscanf(f," %d",&dim);
