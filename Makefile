@@ -6,7 +6,7 @@ all: main
 formules.o: formules.c formules.h
 	$(CC) $(DEBUG) -c $<
 
-sudoku.o: sudoku.c sudoku.h
+liresudoku.o: liresudoku.c liresudoku.h
 	$(CC) $(DEBUG) -c $<
 
 main: main.c formules.o
