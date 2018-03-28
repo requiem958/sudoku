@@ -1,0 +1,8 @@
+On a N^3 variables x(l,c,n)
+
+1ere contrainte :
+     1 clause = N-1 variable (V(n=1->Nà
+     (N  )^2 clauses de taille N-1
+
+2eme contrainte
+     
