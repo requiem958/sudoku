@@ -1,16 +1,16 @@
 #ifndef TO_DIMACS_H
 #define TO_DIMACS_H
 
-int coord_to_number(unsigned int l, unsigned int c, unsigned int n);
-//renvoie id=taille d eligne carré fois l + taille de ligne *c + n 
+unsigned int coord_to_number(unsigned int l, unsigned int c, unsigned int n, unsigned int sudoku_size);
+//renvoie id=taille d eligne carrÃ© fois l + taille de ligne *c + n 
 
-int number_to_coord(unsigned int number, unsigned int *l, unsigned int *c, unsigned int *n);
+int number_to_coord(unsigned int number, unsigned int *l, unsigned int *c, unsigned int *n, unsigned int sudoku_size);
 // renvoie la colone 
 
-void read_dimacs_file(char *dimacs_filename);
-// lire un fichier d'expression logique voir internet format dimacs
+void dimacs_to_sudoku(char *dimacs_file, char *sudoku_file);
+//Ecrit le fichier sudoku correspondant à un fichier dimacs
 
-void write_dimacs_file(char *dimacs_filename);
-// ecrire toute les clauses 
+void sudoku_to_dimacs(char *dimacs_file, char *sudoku_file);
+//Ecrit le fichier dimacs correspondant à un fichier sudoku
 
 #endif

@@ -11,13 +11,13 @@
 typedef enum { FALSE,TRUE } bool;
 
 typedef struct var_s {
-  /* unique coordonnée dimacs*/
+  /* unique coordonnÃ©e dimacs*/
   unsigned int id;
-  /* Triplet de coordonnée sudoku */
+  /* Triplet de coordonnÃ©e sudoku */
   unsigned int l;
   unsigned int c;
   unsigned int n;
-  /*Variable en négation ou non */
+  /*Variable en nÃ©gation ou non */
   bool neg;
 }variable;
 
