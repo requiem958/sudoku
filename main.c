@@ -1,12 +1,71 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "formules.h"
+#define TEST_CLAUSES
+
+#ifdef TEST_NUMBCOORD
+
 #include "to_dimacs.h"
 
-#define TEST_VAR
+#endif
+
+#ifdef TEST_CLAUSES
+
+#include "clauses.h"
+
+#endif
+
+#ifdef TEST_VAR
+
+#include "formules.h"
+
+#endif
 
 int main(void){
+  #ifdef TEST_CLAUSES
+  Clause *c = NULL;
+  Variable v = {0,0,0,0,false};
+
+  printf("%d\n",length(c));
+  for (v.id = 0; v.id < 4;v.id++){
+    printf("pu : %d ",push_var(&c,v));
+    printf("le : %d\n",length(c));
+  }
+  v.id = 3;
+  printf("pu : %d",push_var(&c,v));
+  printf("le : %d\n",length(c));
+
+  printf("Valid %d\n", is_valid(c));
+  v.id = 70;
+  v.neg = !v.neg;
+  push_var(&c,v);
+  printf("Valid after not(70) but no 70  %d\n", is_valid(c));
+  
+  printf("Valid %d\n", is_valid(c));
+  v.neg = !v.neg;
+  push_var(&c,v);
+  printf("Valid after not(70) and 70 %d (Must be 1)\n" , is_valid(c));
+
+  printf("le : %d\n",length(c));
+  c = del_var(&c,v);
+  printf("le : %d (Must be preced line -1)\n",length(c));
+
+  while(c->next != NULL){
+    printf("pop : %d\n",pop_var(&c,&v));
+    printf("var : %d\n",v.id);
+    printf("le : %d\n",length(c));
+  }
+  pop_var(&c,&v);
+  pop_var(&c,&v);
+
+  printf("le : %d\n",length(c));
+  for (v.id = 0; v.id < 4;v.id++)
+    push_var(&c,v);
+  printf("le : %d\n",length(c));
+  free_clause(&c);
+  printf("le : %d\n",length(c));
+  return 0;
+  #endif
   #ifdef TEST_NUMBCOORD
 #define SUDOKU_SIZE 9
   int l=0,c=0,n=1;

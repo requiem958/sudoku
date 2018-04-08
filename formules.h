@@ -4,27 +4,6 @@
 /* Constantes */
 
 #define LEN_MAX_F 100
-#define LEN_MAX_C 100
-
-/* Definitions types*/
-
-typedef enum { FALSE,TRUE } bool;
-
-typedef struct var_s {
-  /* unique coordonnÃ©e dimacs*/
-  unsigned int id;
-  /* Triplet de coordonnÃ©e sudoku */
-  unsigned int l;
-  unsigned int c;
-  unsigned int n;
-  /*Variable en nÃ©gation ou non */
-  bool neg;
-}variable;
-
-typedef struct clause_s {
-  variable var[LEN_MAX_C];
-  unsigned int longueur;
-} clause;
 
 typedef struct formule_s {
   clause clauses[LEN_MAX_F];
