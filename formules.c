@@ -1,63 +1,48 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "formules.h"
 
 /* Sections formules */
 
-formule* creer_formule(void){
-  formule *f = malloc(sizeof(formule));
+Formule new_formule(void){
+  Formule *f = malloc(sizeof(Formule));
   if (f==NULL)
-    return NULL;
-  f->longueur = 0;
-  return f;
+    return (Formule) {NULL,NULL};
+  return *f;
 }
 
-bool is_empty_formule(const formule * f){
-  return f == NULL || f->longueur == 0;
+bool is_empty_formule(const Formule * f){
+  return f == NULL;
 }
 
-void form_push_var(formule *f, const unsigned int i, const Variable v){
-  Clause * c = NULL;
+//Ajout en fin pour liste chainée de formules
+int push_clause(Formule **f,Clause * c){
   if (f == NULL){
-    f = creer_formule();
+    **f = new_formule();
     if(f == NULL){
       puts("Impossible d'allouer la formule");
       return;
     }
   }
-  if (f->longueur == LEN_MAX_F){
-    puts("Plus de place dans cette formule, augmenter LEN_MAX_F");
-    return;
-  }
-  if (i==f->longueur)
-    f->longueur++;
-
-  c = &(f->clauses[i]);
-  //push_var with clauses functions
+  //push_clause with clauses functions
 }
 
-void liberer_formule(formule *f){
-  f->longueur = 0;
+//Recursively free f
+void free_formule(Formule **f){
   free(f);
 }
 
-void reset_formule(formule *f){
-  unsigned int i = 0,j = 0;
-  Clause * iterator = NULL;
-  f->longueur = 0;
-  //TODO: iterate on each clause in f to destroy it (free_clause)
-}
-
-void afficher_formule(const formule *f){
-  unsigned int i = 0;
+//Recursively print f
+void print_formule(const Formule *f){
   if (is_empty_formule(f)){
     puts("Vide");
   }
   else{
     puts("------DEBUT :");
-    for (;i <= f->longueur-1; i++){
-      print_clause(&f->clauses[i]);
-      if (i != f->longueur-1)
+    for (;f != NULL; f=f->next){
+      print_clause(&f->c);
+      if (f->next != NULL)
 	puts("\nET");
     }
     puts("\n------FIN");

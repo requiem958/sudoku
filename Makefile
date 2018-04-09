@@ -13,7 +13,7 @@ types.o: types.c types.h
 clauses.o: clauses.c clauses.h types.h
 	$(CC) $(DEBUG) -c $<
 
-formules.o: formules.c formules.h clauses.h
+formules.o: formules.c formules.h clauses.h types.h
 	$(CC) $(DEBUG) -c $<
 
 liresudoku.o: liresudoku.c liresudoku.h

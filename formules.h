@@ -4,29 +4,44 @@
 #include <stdbool.h>
 #include "types.h"
 #include "clauses.h"
-/* Constantes */
 
-#define LEN_MAX_F 100
+typedef struct Formule{
+  Clause* c;
+  struct Formule * next;
+}Formule;
 
-typedef struct formule_s {
-  Clause clauses[LEN_MAX_F];
-  unsigned int longueur;
-} formule;
 
-/* Definitions fonctions */
+/*Create an empty clause */
+Formule new_formule();
 
-/* Fonctions sur formules */
+/*Return number of something in f */
+int formule_length(Formule *f);
 
-formule * creer_formule(void);
+/*Add a clause to f (if c already in f, not add) */
+int push_clause(Formule **f, Clause * c);
 
-bool is_empty_formule(const formule *f);
+/*Delete the last added var to c and stock it into v*/
+int pop_clause(Formule **f, Clause **c);
 
-void form_push_var(formule *f, const unsigned int i, const Variable v);
+/*Delete the given clause from f and return head of new f, nothing if clause not in f*/
+Clause* del_clause(Formule** f, Clause *c);
 
-void liberer_formule(formule *f);
+/* true if c contains a var and it's neg*/
+bool formule_is_valid(const Formule *f);
 
-void afficher_formule(const formule *f);
+/*Free c from memory*/
+void free_formule(Formule **f);
 
-void reset_formule(formule *f);
+/* Return true only if f points to NULL*/
+bool is_empty_formule(const Formule* f);
+
+/* Print f in the form : 
+   print_clause(head)
+ET
+print_clause(head->next)
+ET
+...
+ */
+void print_formule(const Formule* c);
 
 #endif

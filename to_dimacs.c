@@ -4,17 +4,17 @@
 #include "formules.h"
 #include "to_dimacs.h"
 
-//Convertit le fichier dimacs en formule
-static void read_dimacs(char *filename, formule *f);
+//Convertit le fichier dimacs en Formule
+static void read_dimacs(char *filename, Formule *f);
 
-//Ecrit le fichier dimacs correspondant Ã  la formule f
-static void write_dimacs(char *filename, formule *f, int sudoku_size);
+//Ecrit le fichier dimacs correspondant Ã  la Formule f
+static void write_dimacs(char *filename, Formule *f, int sudoku_size);
 
-//Convertit le fichier sudoku en formule
-static void read_sudoku(char *filename, formule *f, int sudoku_size);
+//Convertit le fichier sudoku en Formule
+static void read_sudoku(char *filename, Formule *f, int sudoku_size);
 
-//Ecrit le fichier sudoku correspondant Ã  la formule f
-static void write_sudoku(char *filename, formule *f, int sudoku_size);
+//Ecrit le fichier sudoku correspondant Ã  la Formule f
+static void write_sudoku(char *filename, Formule *f, int sudoku_size);
 
 //Convertit une coordonÃ©e (l,c,n) en un nombre entier, selon la taille du sudoku
 unsigned int coord_to_number(unsigned int l, unsigned int c, unsigned int n, unsigned int sudoku_size){
@@ -36,23 +36,25 @@ int number_to_coord(unsigned int number, unsigned int *l, unsigned int *c, unsig
 }
 
 void dimacs_to_sudoku(char *dimacs_file, char *sudoku_file){
-  formule *f = creer_formule();
+  Formule *f = NULL;
+  *f = new_formule();
   read_dimacs(dimacs_file, f);
   write_sudoku(sudoku_file, f,0);
-  liberer_formule(f);
+  free_formule(&f);
 }
 
 void sudoku_to_dimacs(char *dimacs_file, char *sudoku_file){
-  formule *f = creer_formule();
+  Formule *f =NULL;
+  *f = new_formule();
   read_sudoku(sudoku_file,f,0);
   write_dimacs(dimacs_file,f,0);
-  liberer_formule(f);
+  free_formule(&f);
 }
 
 /* Fonctions locales */
 
 //Convertit le fichier dimacs en formule
-static void read_dimacs(char *filename, formule *f){
+static void read_dimacs(char *filename, Formule *f){
   FILE *df = fopen(filename,"r");
   f=NULL;
   if (df == NULL)
@@ -62,7 +64,7 @@ static void read_dimacs(char *filename, formule *f){
 }
 
 //Ecrit le fichier dimacs correspondant Ã  la formule f
-static void write_dimacs(char *filename, formule *f, int sudoku_size){
+static void write_dimacs(char *filename, Formule *f, int sudoku_size){
   FILE *df = fopen(filename,"w");
   fclose(df);
   f = NULL;
@@ -70,7 +72,7 @@ static void write_dimacs(char *filename, formule *f, int sudoku_size){
 }
 
 //Convertit le fichier sudoku en formule
-static void read_sudoku(char *filename, formule *f, int sudoku_size){
+static void read_sudoku(char *filename, Formule *f, int sudoku_size){
   FILE *df = fopen(filename,"w");
   fclose(df);
   f = NULL;
@@ -78,7 +80,7 @@ static void read_sudoku(char *filename, formule *f, int sudoku_size){
 }
 
 //Ecrit le fichier sudoku correspondant Ã  la formule f
-static void write_sudoku(char *filename, formule *f, int sudoku_size){
+static void write_sudoku(char *filename, Formule *f, int sudoku_size){
   FILE *df = fopen(filename,"w");
   fclose(df);
   f = NULL;
