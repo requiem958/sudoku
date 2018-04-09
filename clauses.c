@@ -1,4 +1,6 @@
+#include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "types.h"
 #include "clauses.h"
 
@@ -97,5 +99,21 @@ void free_clause(Clause **c){
     (*c)->next = NULL;
     free(*c);
     *c = NULL;
+  }
+}
+
+bool is_empty_clause(const Clause* c){
+  return c == NULL;
+}
+
+void afficher_clause(const Clause* c){
+  unsigned int i = 0;
+  if (is_empty_clause(c))
+    puts("Vide");
+  else{
+    //iteration on each member of clause
+      afficher_variable(NULL);
+      if(c->next != NULL)
+	fputs("OU",stdout);
   }
 }

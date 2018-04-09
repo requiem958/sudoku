@@ -18,4 +18,11 @@ typedef struct{
 #define VAR_EQ(v1,v2) (v1.id == v2.id && v1.neg == v2.neg)
 
 #define VAR_EQ_NOT(v1,v2) (v1.id == v2.id && v1.neg != v2.neg)
+
+bool neg_var(Variable *v);
+
+int set_var_id(Variable* v,const int id);
+
+void afficher_variable(const Variable* v);
+
 #endif

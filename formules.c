@@ -16,8 +16,8 @@ bool is_empty_formule(const formule * f){
   return f == NULL || f->longueur == 0;
 }
 
-void push_var(formule *f, const unsigned int i, const variable v){
-  clause * c = NULL;
+void form_push_var(formule *f, const unsigned int i, const Variable v){
+  Clause * c = NULL;
   if (f == NULL){
     f = creer_formule();
     if(f == NULL){
@@ -33,12 +33,7 @@ void push_var(formule *f, const unsigned int i, const variable v){
     f->longueur++;
 
   c = &(f->clauses[i]);
-
-  if (c->longueur == LEN_MAX_C){
-    puts("Plus de place dans la clause, augmenter LEN_MAX_C");
-    return;
-  }
-  c->var[c->longueur++] = v;
+  //push_var with clauses functions
 }
 
 void liberer_formule(formule *f){
@@ -48,16 +43,9 @@ void liberer_formule(formule *f){
 
 void reset_formule(formule *f){
   unsigned int i = 0,j = 0;
-  clause * c = NULL;
+  Clause * iterator = NULL;
   f->longueur = 0;
-  for (;i < LEN_MAX_F-1;i++){
-    c = &f->clauses[i];
-    for (; j < LEN_MAX_C-1;j++){
-      set_var_id(&c->var[j], 0);
-      c->var[j].neg = FALSE;
-    }
-    c->longueur = 0;
-  }
+  //TODO: iterate on each clause in f to destroy it (free_clause)
 }
 
 void afficher_formule(const formule *f){
@@ -74,48 +62,4 @@ void afficher_formule(const formule *f){
     }
     puts("\n------FIN");
   }
-}
-
-/*Section clauses */
-
-bool is_empty_clause(const clause * c){
-  return c == NULL || c->longueur == 0;
-}
-
-void afficher_clause(const clause *c){
-  unsigned int i = 0;
-  if (is_empty_clause(c)){
-    puts("Vide");
-  }
-  else{
-    for (;i <= c->longueur-1; i++){
-      afficher_variable(&c->var[i]);
-      if (i != c->longueur-1)
-	fputs("OU",stdout);
-    }
-  }
-}
-/*Section variables */
-
-bool neg_var(variable * v){
-  if ( v != NULL)
-    return v->neg = (v->neg == FALSE) ? TRUE : FALSE;
-  return FALSE;
-}
-
-int set_var_id(variable *v, const int id){
-  if (v != NULL)
-    return v->id = id;
-  return -1;
-}
-
-void afficher_variable(const variable * v){
-  if (v==NULL)
-    return;
-
-  if (v->neg){
-    printf(" NOT( x:%d ) ", v->id);
-    return;
-  }
-  printf(" x:%d ", v->id);
 }

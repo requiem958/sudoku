@@ -30,4 +30,9 @@ bool is_valid(const Clause *c);
 /*Free c from memory*/
 void free_clause(Clause **c);
 
+bool is_empty_clause(const Clause* c);
+
+void print_clause(const Clause* c);
+
+
 #endif
