@@ -106,14 +106,15 @@ bool is_empty_clause(const Clause* c){
   return c == NULL;
 }
 
-void afficher_clause(const Clause* c){
+void print_clause(const Clause* c){
   unsigned int i = 0;
   if (is_empty_clause(c))
     puts("Vide");
   else{
-    //iteration on each member of clause
-      afficher_variable(NULL);
+    for (; c != NULL; c = c->next){
+      afficher_variable(&c->v);
       if(c->next != NULL)
 	fputs("OU",stdout);
+    }
   }
 }

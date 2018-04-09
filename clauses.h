@@ -30,9 +30,10 @@ bool is_valid(const Clause *c);
 /*Free c from memory*/
 void free_clause(Clause **c);
 
+/* Return true only if c points to NULL*/
 bool is_empty_clause(const Clause* c);
 
+/* Print c in the form : NOT(var1.id) OU var2.id OU ....*/
 void print_clause(const Clause* c);
-
 
 #endif

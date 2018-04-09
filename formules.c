@@ -56,7 +56,7 @@ void afficher_formule(const formule *f){
   else{
     puts("------DEBUT :");
     for (;i <= f->longueur-1; i++){
-      afficher_clause(&f->clauses[i]);
+      print_clause(&f->clauses[i]);
       if (i != f->longueur-1)
 	puts("\nET");
     }
