@@ -72,11 +72,51 @@ static void write_dimacs(char *filename, Formule *f, int sudoku_size){
 }
 
 //Convertit le fichier sudoku en formule
-static void read_sudoku(char *filename, Formule *f, int sudoku_size){
+static void read_sudoku(char *filename, Formule *f, int* sudoku_size){
   FILE *df = fopen(filename,"w");
-  fclose(df);
-  f = NULL;
-  sudoku_size = 0;
+  sudoku s;
+  Clause *c = NULL;
+  Variable v;
+  int i = 0, c = 0;
+  readsudokufile(df,&s);
+
+  //First part : Gen constraint 1 (Domain)
+  v.neg = false;
+  for (; i < s.taille; i++){
+    v.l = i;
+    for (; c < s.taile; c++){
+      v.c = c;
+      *c = new_clause();
+      for (v.n = 1; v.n <= s.taille; v.n++){
+	v.id = coord_to_number(v.l,v.c,v.n, s.taille);
+	push_var(&c,v);
+      }
+      push_clause(&f,c);
+    }
+  }
+
+  //Second part : Gen constraint 2 (Line unicity)
+
+  //Third part  : Gen constraint 3 (Column unicity)
+
+  //Fourth part : Gen constraint 4 (Square unicity)
+
+  //Fifth part  : Gen sudoku corresponding clauses
+
+  for (i=0; i < s.taille; i++){
+    v.l = i;
+    for (c=0; c < s.taille; c++){
+      v.c = c;
+      //Si on a une case remplie
+      if (s.grille[i][c] != 0){
+	*c = new_clause();
+	v.n = s.grille[i][c];
+	v.id = coord_to_number(v.l,v.c,v.n,s.taille);
+	//La mettre en clause
+	push_var(&c,v);
+	push_clause(&f,c)
+      }
+    }
 }
 
 //Ecrit le fichier sudoku correspondant Ã  la formule f
