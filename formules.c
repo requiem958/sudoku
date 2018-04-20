@@ -17,20 +17,31 @@ bool is_empty_formule(const Formule * f){
 }
 
 //Ajout en fin pour liste chainée de formules
-int push_clause(Formule **f,Clause * c){
-  if (f == NULL){
-    **f = new_formule();
+int push_clause(Formule **f,Clause *c){
+  if (*f == NULL){
+    *f = malloc(sizeof(Formule));
     if(f == NULL){
       puts("Impossible d'allouer la formule");
-      return;
+      return -1;
     }
+    (*f)->c = clause_copy(c);
+    return 0;
   }
-  //push_clause with clauses functions
+  else if (equal_clause((*f)->c,c))
+    return 1;
+  else
+    return push_clause(&(*f)->next,c);
 }
 
 //Recursively free f
 void free_formule(Formule **f){
-  free(f);
+  if (*f == NULL)
+    return;
+  else{
+    free_clause(&((*f)->c));
+    free_formule(&((*f)->next));
+    free(*f);
+  }
 }
 
 //Recursively print f
@@ -41,7 +52,7 @@ void print_formule(const Formule *f){
   else{
     puts("------DEBUT :");
     for (;f != NULL; f=f->next){
-      print_clause(&f->c);
+      print_clause(f->c);
       if (f->next != NULL)
 	puts("\nET");
     }

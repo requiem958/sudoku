@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "liresudoku.h"
 #include "formules.h"
 #include "to_dimacs.h"
 

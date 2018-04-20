@@ -12,6 +12,8 @@ typedef struct Clause{
 /*Create an empty clause */
 Clause new_clause();
 
+Clause* clause_copy(Clause *src);
+
 /*Return number of var in c */
 int length(Clause *c);
 
@@ -35,5 +37,7 @@ bool is_empty_clause(const Clause* c);
 
 /* Print c in the form : NOT(var1.id) OU var2.id OU ....*/
 void print_clause(const Clause* c);
+
+bool equal_clause(Clause *c1, Clause *c2);
 
 #endif

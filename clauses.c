@@ -6,7 +6,20 @@
 
 Clause new_clause(){
   Clause *c = malloc(sizeof(Clause));
+  c->next = NULL;
   return *c;
+}
+
+Clause* clause_copy(Clause* src){
+  Clause* dest = NULL;
+  Clause** iter = &dest;
+  while (src != NULL){
+    *iter = malloc(sizeof(Clause));
+    (*iter)->v = src->v;
+    iter = &(*iter)->next;
+    src = src->next;
+  }
+  return dest;
 }
 
 // tail-rec fun, with nested functions (not allowed with pedantic)
@@ -28,7 +41,7 @@ int push_var(Clause **c, Variable v){
     (*c)->v = v;
     return 0;
   }
-  else if (VAR_EQ((*c)->v,v))
+  else if (VAR_EQ(v,(*c)->v))
     return 1;
   else
     return push_var(&(*c)->next,v);
@@ -107,7 +120,6 @@ bool is_empty_clause(const Clause* c){
 }
 
 void print_clause(const Clause* c){
-  unsigned int i = 0;
   if (is_empty_clause(c))
     puts("Vide");
   else{
@@ -116,5 +128,36 @@ void print_clause(const Clause* c){
       if(c->next != NULL)
 	fputs("OU",stdout);
     }
+    puts("");
   }
+}
+
+//c1 and c2 are not null here
+static bool equalcl(Clause *c1, Clause *c2){
+  Clause *head = c2;
+
+  while (c1 != NULL){
+    if (c2 == NULL)
+      return false;
+    else{
+      if (VAR_EQ(c1->v,c2->v)){
+	c1 = c1->next;
+	c2 = head;
+      }
+      else
+	c2 = c2->next;
+    }
+  }
+  return true;
+}
+
+bool equal_clause(Clause *c1, Clause *c2){
+  if (c1==c2 && c2==NULL)
+    return true;
+  else if ((!c1 && c2) || (c1 && !c2))
+    return false;
+  else if (length(c1) != length(c2))
+    return false;
+  else
+    return equalcl(c1,c2);
 }

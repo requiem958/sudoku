@@ -1,22 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TEST_CLAUSES
+#define TEST_FORM
 
 #ifdef TEST_NUMBCOORD
 
+#include "types.h"
+#include "clauses.h"
+#include "formules.h"
 #include "to_dimacs.h"
 
 #endif
 
 #ifdef TEST_CLAUSES
 
+#include "types.h"
 #include "clauses.h"
 
 #endif
 
-#ifdef TEST_VAR
+#ifdef TEST_FORM
 
+#include "types.h"
+#include "clauses.h"
 #include "formules.h"
 
 #endif
@@ -24,24 +30,38 @@
 int main(void){
   #ifdef TEST_CLAUSES
   Clause *c = NULL;
+  Clause *c2 = NULL;
   Variable v = {0,0,0,0,false};
 
+  //Null clause length test
   printf("%d\n",length(c));
-  for (v.id = 0; v.id < 4;v.id++){
-    printf("pu : %d ",push_var(&c,v));
-    printf("le : %d\n",length(c));
-  }
-  v.id = 3;
-  printf("pu : %d",push_var(&c,v));
-  printf("le : %d\n",length(c));
 
-  printf("Valid %d\n", is_valid(c));
+  //push_clause test
+  for (v.id = 0; v.id < 4;v.id++){
+    printf("pu : %d (Must be 0)",push_var(&c,v));
+    printf("le : %d (Must be %d)\n",length(c),v.id+1);
+  }
+  //
+  printf("Equals ? %d Must be 1\n", equal_clause(c,c));
+  push_var(&c2,(Variable){-1,0,0,0,false});
+  push_var(&c2,(Variable){10,0,0,0,false});
+  push_var(&c2,(Variable){8,0,0,0,false});
+  printf("Equals ? %d Must be 0\n", equal_clause(c,c2));
+  getchar();
+  //Print clause
+  print_clause(c);
+  //push_clause with something already present
+  v.id = 3;
+  printf("pu : %d (Must be 1)",push_var(&c,v));
+  printf("le : %d (Must be 401)\n",length(c));
+
+  //Validity of an unvalid clause
+  printf("Valid %d (Must be 0\n", is_valid(c));
   v.id = 70;
   v.neg = !v.neg;
   push_var(&c,v);
-  printf("Valid after not(70) but no 70  %d\n", is_valid(c));
-  
-  printf("Valid %d\n", is_valid(c));
+  printf("Valid after not(70) but no 70  %d (Must be 0)\n", is_valid(c));
+
   v.neg = !v.neg;
   push_var(&c,v);
   printf("Valid after not(70) and 70 %d (Must be 1)\n" , is_valid(c));
@@ -96,28 +116,24 @@ int main(void){
   
   return 0;
   #endif
-  #ifdef TEST_VAR
-  formule *f=NULL;
-  variable v;
-  v.neg = FALSE;
+  #ifdef TEST_FORM
+  Formule *f=NULL;
+  Clause *c =NULL;
+  Variable v;
+  for (v.id = 0; v.id < 4;v.id++)
+      push_var(&c,v);
+  push_clause(&f,c);
+  free_clause(&c);
+  for (v.id = 4; v.id < 8;v.id++)
+      push_var(&c,v);
+  push_clause(&f,c);
+  free_clause(&c);
+  for (v.id = 8; v.id < 12;v.id++)
+      push_var(&c,v);
+  push_clause(&f,c);
 
-  f = creer_formule();
-  
-  set_var_id (&v, 101);
-  push_var(f,0,v);
-
-  set_var_id(&v,99);
-  push_var(f,0,v);
-
-  set_var_id(&v,200);
-  push_var(f,0,v);
-
-  neg_var(&v);
-  push_var(f,1,v);
-  afficher_formule(f);
-
-  liberer_formule(f);
-
+  print_formule(f);
+  free_formule(&f);
   return 0;
   #endif
 }

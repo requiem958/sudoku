@@ -17,6 +17,8 @@ typedef struct{
 
 #define VAR_EQ(v1,v2) (v1.id == v2.id && v1.neg == v2.neg)
 
+#define VAR_INF(v1,v2) (v1.id < v2.id)
+
 #define VAR_EQ_NOT(v1,v2) (v1.id == v2.id && v1.neg != v2.neg)
 
 bool neg_var(Variable *v);

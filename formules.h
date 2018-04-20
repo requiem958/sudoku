@@ -6,7 +6,7 @@
 #include "clauses.h"
 
 typedef struct Formule{
-  Clause* c;
+  Clause *c;
   struct Formule * next;
 }Formule;
 
@@ -18,7 +18,7 @@ Formule new_formule();
 int formule_length(Formule *f);
 
 /*Add a clause to f (if c already in f, not add) */
-int push_clause(Formule **f, Clause * c);
+int push_clause(Formule **f, Clause *c);
 
 /*Delete the last added var to c and stock it into v*/
 int pop_clause(Formule **f, Clause **c);
