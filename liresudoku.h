@@ -16,4 +16,10 @@ void readsudokufile (FILE *f,sudoku *a);
 // 0 3 4 5
 // 0 9 8 7
 
+//Ecrit la grille a dans le ficher f
+void writesudokufile(FILE*f, sudoku *a);
+
 void affichergrille (sudoku* a);
+
+//Local function to see if a is a perfect_square = a k*k, k in N
+int is_perfect_square(int a);

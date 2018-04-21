@@ -20,7 +20,7 @@ formules.o: formules.c formules.h clauses.h types.h
 liresudoku.o: liresudoku.c liresudoku.h
 	$(CC) $(DEBUG) -c $<
 
-main: main.c clauses.o types.o formules.o #to_dimacs.o
+main: main.c clauses.o types.o formules.o liresudoku.o to_dimacs.o
 	$(CC) $(DEBUG) -o $@ $^
 
 clean:

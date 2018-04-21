@@ -44,4 +44,10 @@ ET
  */
 void print_formule(const Formule* c);
 
+void to_3sat(Formule** f);
+
+int count_var_in_formule(const Formule* f);
+
+int count_clauses_in_formule(const Formule*f);
+
 #endif

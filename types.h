@@ -5,9 +5,9 @@
 #include <stdbool.h>
 
 typedef struct{
-  /* unique coordonnée dimacs*/
+  /* unique coordonnÃ©e dimacs*/
   unsigned int id;
-  /* Triplet de coordonnée sudoku */
+  /* Triplet de coordonnÃ©e sudoku */
   unsigned int l;
   unsigned int c;
   unsigned int n;

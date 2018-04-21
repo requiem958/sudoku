@@ -16,6 +16,26 @@ bool is_empty_formule(const Formule * f){
   return f == NULL;
 }
 
+int count_var_in_formule(const Formule * f){
+  Clause *distinct_var = NULL;
+  Clause *c_iter = NULL;
+  int l=0;
+  for(; f != NULL; f = f->next)
+    for (c_iter = f->c; c_iter != NULL; c_iter++)
+      push_var(&distinct_var,c_iter->v);
+  //On utilise le fait que push_var n'ajoute une variable que si elle n'est pas présente
+  l = length(distinct_var);
+  free_clause(&distinct_var);
+  return l;
+}
+
+int count_clause_in_formule(const Formule *f){
+  int i = 0;
+  for(;f!= NULL;f=f->next)
+    i++;
+  return i;
+}
+
 //Ajout en fin pour liste chainée de formules
 int push_clause(Formule **f,Clause *c){
   if (*f == NULL){
@@ -44,7 +64,7 @@ void free_formule(Formule **f){
   }
 }
 
-//Recursively print f
+//Not Recursively print f
 void print_formule(const Formule *f){
   if (is_empty_formule(f)){
     puts("Vide");
@@ -58,4 +78,13 @@ void print_formule(const Formule *f){
     }
     puts("\n------FIN");
   }
+}
+
+void to_3sat(Formule **f){
+  int new_id = count_var_in_formule(*f);
+
+  /*Et là je me demande est-ce que je vous laisse finir l'algo 3 sat...
+   Je vais déjà tout poster sur le github pour voir
+Au fait l'algo est : http://inf242.forge.imag.fr/SAT-3SAT-and-other-red.pdf
+Si vous  êtes motivés */
 }
