@@ -118,7 +118,7 @@ int main(void){
   #endif
   #ifdef TEST_FORM
 
-  /* Test new_formule : retourne une formule */
+  /* Test new_formule : retourne une formule vide */
   /* Cas : initialisé */
   Formule f1 = new_formule();
 
@@ -126,11 +126,7 @@ int main(void){
   Formule * f2 = NULL;
 
   /* Cas : non initialisé */
-  Formule f3;
-
-  Clause * c = NULL;
-
-  
+  Formule f3;  
 
   /* Test is_empty_formule : retourne un booléen */
 
@@ -149,6 +145,7 @@ int main(void){
   /* Test count_clauses_in_formule : retourne un entier */
   /* Résultat attendu : 1 */ 
 
+   Clause * c = NULL;
   Variable v;
   Formule * f4 = NULL;
 
@@ -157,10 +154,41 @@ int main(void){
 
 	push_clause(&f4,c);
 	printf("nombre de var = %i\n",count_var_in_formule(f4));
-	printf("nombre de clauses = %i\n",count_clauses_in_formule(f4));
+	printf("nombre de clauses = %i\n\n",count_clauses_in_formule(f4));
 	free_clause(&c);
+
+  /* Test new_clause : retourne une clause vide */
+  /* Test length : retourne un entier */
+  Variable v1;
+  Clause  c1 = new_clause();
+
+  Clause * c2 = NULL;
+
+  for(v1.id = 0; v1.id < 4; v1.id++)
+	push_var(&c2,v1);
+
+  printf("Clause c2 , taile (%i) : \n",length(c2));
+  print_clause(c2);
+  printf("\n");
+
+  /* Test copy_clause : retounre une clause */
+  Clause * c3 = NULL;
+
+  c3 = clause_copy(c2);
 	
-  
+  printf("Clause c3 , taille(%i) : \n",length(c3));
+  print_clause(c3);
+  printf("\n");
+
+  /* Test pop_var : retourne un entier */
+  printf("Clause c3, dernière variable (id) : %i \n\n",v1.id);
+
+  /* Test del_var : retroune une clause moins la variable donnée */
+  c3 = del_var(&c3,v1);
+
+  print_clause(c3);
+
+
  
  
   return 0;
