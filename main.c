@@ -117,6 +117,7 @@ int main(void){
   return 0;
   #endif
   #ifdef TEST_FORM
+/*
   Formule *f=NULL;
   Clause *c =NULL;
   Variable v;
@@ -134,6 +135,17 @@ int main(void){
 
   print_formule(f);
   free_formule(&f);
+  */
+ Variable v;
+  Formule * f4 = NULL;
+
+  for(v.id = 0; v.id < 4; v.id++)
+	push_var(&c,v);
+
+	push_clause(&f4,c);
+	free_clause(&c);
+	printf("%i\n",count_var_in_formule(f4));
+	
   return 0;
   #endif
 }
