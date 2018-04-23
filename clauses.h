@@ -21,7 +21,7 @@ int length(Clause *c);
 int push_var(Clause **c, Variable v);
 
 /*Delete the last added var to c and stock it into v*/
-int pop_var(Clause **c, Variable *v);
+int pop_var(Clause *c, Variable *v);
 
 /*Delete the given var from c and return head of new c, nothing if var not in c*/
 Clause* del_var(Clause** c, Variable v);

@@ -48,20 +48,20 @@ int push_var(Clause **c, Variable v){
   
 }
 
-int pop_var(Clause **c, Variable *v){
-  if (*c==NULL)
+int pop_var(Clause *c, Variable *v){
+  if (c==NULL)
     return -1;
-  if ((*c)->next == NULL){
-    free(*c);
-    *c = NULL;
+  if (c->next == NULL){
+    free(c);
+    c = NULL;
     return 1;
   }
 
-  while ((*c)->next->next != NULL)
-    c = &(*c)->next;
-  *v = (*c)->next->v;
-  free((*c)->next);
-  (*c)->next=NULL;
+  while (c->next->next != NULL)
+    c = c->next;
+  *v = c->next->v;
+  free(c->next);
+  c->next=NULL;
   return 0;
 }
 
