@@ -23,20 +23,20 @@ int count_var_in_formule(const Formule * f){
   for(; f != NULL; f = f->next)
     for (c_iter = f->c; c_iter != NULL; c_iter++)
       push_var(&distinct_var,c_iter->v);
-  //On utilise le fait que push_var n'ajoute une variable que si elle n'est pas présente
+  //On utilise le fait que push_var n'ajoute une variable que si elle n'est pas prÃ©sente
   l = length(distinct_var);
   free_clause(&distinct_var);
   return l;
 }
 
-int count_clause_in_formule(const Formule *f){
+int count_clauses_in_formule(const Formule *f){
   int i = 0;
   for(;f!= NULL;f=f->next)
     i++;
   return i;
 }
 
-//Ajout en fin pour liste chainée de formules
+//Ajout en fin pour liste chainÃ©e de formules
 int push_clause(Formule **f,Clause *c){
   if (*f == NULL){
     *f = malloc(sizeof(Formule));
@@ -83,8 +83,8 @@ void print_formule(const Formule *f){
 void to_3sat(Formule **f){
   int new_id = count_var_in_formule(*f);
 
-  /*Et là je me demande est-ce que je vous laisse finir l'algo 3 sat...
-   Je vais déjà tout poster sur le github pour voir
+  /*Et lÃ  je me demande est-ce que je vous laisse finir l'algo 3 sat...
+   Je vais dÃ©jÃ  tout poster sur le github pour voir
 Au fait l'algo est : http://inf242.forge.imag.fr/SAT-3SAT-and-other-red.pdf
-Si vous  êtes motivés */
+Si vous  Ãªtes motivÃ©s */
 }
