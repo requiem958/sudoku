@@ -21,7 +21,7 @@ int count_var_in_formule(const Formule * f){
   Clause *c_iter = NULL;
   int l=0;
   for(; f != NULL; f = f->next)
-    for (c_iter = f->c; c_iter != NULL; c_iter++)
+    for (c_iter = f->c; c_iter != NULL; c_iter=c_iter->next)
       push_var(&distinct_var,c_iter->v);
   //On utilise le fait que push_var n'ajoute une variable que si elle n'est pas présente
   l = length(distinct_var);
