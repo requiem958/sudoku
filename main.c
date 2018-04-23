@@ -136,6 +136,7 @@ int main(void){
   print_formule(f);
   free_formule(&f);
   */
+Clause * c = NULL;
  Variable v;
   Formule * f4 = NULL;
 
