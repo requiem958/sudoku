@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include "formules.h"
 
+
+static Variable* init_fvar (unsigned int ind);
 /* Sections formules */
 
 Formule new_formule(void){
@@ -80,11 +82,95 @@ void print_formule(const Formule *f){
   }
 }
 
-void to_3sat(Formule **f){
-  int new_id = count_var_in_formule(*f);
+static Variable* init_fvar (unsigned int ind){
+	 Variable *a= (Variable*) malloc(sizeof(Variable));
+	a->id = ind ;
+	a->n=-1;
+	a->l=-1;
+	a->c=-1;
+	a->neg=1;
+	return a;
+}
+#define initc(x) x =(Clause *) malloc(sizeof(Clause));x->next =(Clause *) malloc(sizeof(Clause));x->next->next =(Clause *) malloc(sizeof(Clause))
 
-  /*Et là je me demande est-ce que je vous laisse finir l'algo 3 sat...
-   Je vais déjà tout poster sur le github pour voir
-Au fait l'algo est : http://inf242.forge.imag.fr/SAT-3SAT-and-other-red.pdf
-Si vous  êtes motivés */
+void to_3sat(Formule **f){
+	unsigned int  ind,ln,i;
+	Clause *x,*w;
+	Variable *a,*b,*Na,*Nb;
+	ind=-1;
+	while (f!=NULL){
+		ln = length((*f)->c);
+		if (length((*f)->c)==1){
+			initc(x);
+			a = init_fvar (ind);
+			Na=init_fvar (ind);
+			Na->neg=0;
+			ind--;
+			b = init_fvar (ind);
+			Nb=init_fvar (ind);
+			Nb->neg=0;
+			ind--;
+			// cas -z1 y1 -z2 
+			(*f)->c->next->v= *a;
+			(*f)->c->next->next->v=*b;
+			// cas z1 y1 z2
+			x->v= *a;
+			x->next->v= (*f)->c->v;
+			x->next->next->v=*b;
+			push_clause(f,x);
+			initc(x);// cas -z1 y1 z2
+			x->v= *a;
+			x->next->v= (*f)->c->v;
+			x->next->next->v=*b;
+			push_clause(f,x);
+			initc(x);// cas z1 y1 -z2
+			x->v= *a;
+			x->next->v= (*f)->c->v;
+			x->next->next->v=*b;
+			push_clause(f,x);
+		}else if (length ((*f)->c)==2){
+			 initc(x);
+			a = init_fvar (ind);
+			Na=init_fvar (ind);
+			Na->neg=0;;
+			ind--;
+			// cas y1 y2 z1
+			(*f)->c->next->next->v=*a;
+			//cas y1 y2 -z1
+			x->v= *Na;
+			x->next->v= (*f)->c->v;
+			x->next->next->v=(*f)->c->next->v;
+			push_clause(f,x);
+		}else if (length ((*f)->c)>3){
+			w =(Clause *) malloc(sizeof(Clause));//y1 y2 z1
+			a = init_fvar (ind);
+			Na=init_fvar (ind);
+			Na->neg=0;;
+			ind--;
+			w= (*f)->c->next->next;
+			(*f)->c->next->next->v= *a;
+			(*f)->c->next->next->next=NULL;
+			for (i=4;i<ln;i++){// -zk-2 yk zk-1
+				initc(x);
+				b = init_fvar (ind);
+				Nb=init_fvar (ind);
+				Nb->neg=0;
+				ind--;
+				x->v= *Na;
+				x->next->v=w->v;
+				w=w->next;
+				x->next->next->v=*b;
+				a=b;
+				Na=Nb;
+				push_clause(f,x);
+			}
+			initc(x);// yn zn zn+1
+			x->v=*Na;
+			x->next->v=w->v;
+			x->next->next->v=w->next->v;
+			push_clause(f,x);
+		}
+		*f=(*f)->next;
+	}
+//Au fait l'algo est : http://inf242.forge.imag.fr/SAT-3SAT-and-other-red.pdf
 }
