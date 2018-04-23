@@ -164,9 +164,10 @@ int main(void){
 
   Clause * c2 = NULL;
 
+
   for(v1.id = 0; v1.id < 4; v1.id++)
     push_var(&c2,v1);
-
+//A ce point ci, v1.id = 4, car on sort du for dès que v1.id >=4
   printf("Clause c2 , taile (%i) : \n",length(c2));
   print_clause(c2);
   printf("\n");
@@ -175,22 +176,39 @@ int main(void){
   Clause * c3 = NULL;
 
   c3 = clause_copy(c2);
-	
+
   printf("Clause c3 , taille(%i) : \n",length(c3));
   print_clause(c3);
   printf("\n");
 
   /* Test pop_var : retourne un entier */
-  printf("Clause c3, dernière variable (id) : %i \n\n",v1.id);
 
+  v1.id = 0;
+  printf("Clause c3, variable à suppr (id) : %i \n\n",v1.id);
   /* Test del_var : retroune une clause moins la variable donnée */
   c3 = del_var(&c3,v1);
 
   print_clause(c3);
 
+  /* Test pop_var : retourne un entier */
+  v1.id = 2;
+  printf("Clause c3, variable à suppr (id) : %i \n\n",v1.id);
+  /* Test del_var : retroune une clause moins la variable donnée */
+  c3 = del_var(&c3,v1);
 
- 
- 
+  print_clause(c3);
+
+  v1.id = 1;
+  /* Test del_var : retroune une clause moins la variable donnée */
+  c3 = del_var(&c3,v1);
+
+  print_clause(c3);
+
+  v1.id = 3;
+  /* Test del_var : retroune une clause moins la variable donnée */
+  c3 = del_var(&c3,v1);
+
+  print_clause(c3);
   return 0;
 #endif
 }
