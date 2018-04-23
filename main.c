@@ -144,9 +144,8 @@ int main(void){
     push_var(&c,v);
 
   push_clause(&f4,c);
-  //  free_clause(&c);
+  free_clause(&c);
   printf("%i\n",count_var_in_formule(f4));
-	
   return 0;
 #endif
 }
