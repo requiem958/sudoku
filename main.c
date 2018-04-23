@@ -28,7 +28,7 @@
 #endif
 
 int main(void){
-  #ifdef TEST_CLAUSES
+#ifdef TEST_CLAUSES
   Clause *c = NULL;
   Clause *c2 = NULL;
   Variable v = {0,0,0,0,false};
@@ -85,8 +85,8 @@ int main(void){
   free_clause(&c);
   printf("le : %d\n",length(c));
   return 0;
-  #endif
-  #ifdef TEST_NUMBCOORD
+#endif
+#ifdef TEST_NUMBCOORD
 #define SUDOKU_SIZE 9
   int l=0,c=0,n=1;
   int number=0;
@@ -115,8 +115,8 @@ int main(void){
     puts("Il manque des valeurs");
   
   return 0;
-  #endif
-  #ifdef TEST_FORM
+#endif
+#ifdef TEST_FORM
 
   /* Test new_formule : retourne une formule vide */
   /* Cas : initialisé */
@@ -145,17 +145,17 @@ int main(void){
   /* Test count_clauses_in_formule : retourne un entier */
   /* Résultat attendu : 1 */ 
 
-   Clause * c = NULL;
+  Clause * c = NULL;
   Variable v;
   Formule * f4 = NULL;
 
   for(v.id = 0; v.id < 4; v.id++)
-	push_var(&c,v);
+    push_var(&c,v);
 
-	push_clause(&f4,c);
-	printf("nombre de var = %i\n",count_var_in_formule(f4));
-	printf("nombre de clauses = %i\n\n",count_clauses_in_formule(f4));
-	free_clause(&c);
+  push_clause(&f4,c);
+  printf("nombre de var = %i\n",count_var_in_formule(f4));
+  printf("nombre de clauses = %i\n\n",count_clauses_in_formule(f4));
+  free_clause(&c);
 
   /* Test new_clause : retourne une clause vide */
   /* Test length : retourne un entier */
@@ -165,7 +165,7 @@ int main(void){
   Clause * c2 = NULL;
 
   for(v1.id = 0; v1.id < 4; v1.id++)
-	push_var(&c2,v1);
+    push_var(&c2,v1);
 
   printf("Clause c2 , taile (%i) : \n",length(c2));
   print_clause(c2);
@@ -192,5 +192,5 @@ int main(void){
  
  
   return 0;
-  #endif
+#endif
 }
