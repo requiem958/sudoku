@@ -117,36 +117,52 @@ int main(void){
   return 0;
   #endif
   #ifdef TEST_FORM
-/*
-  Formule *f=NULL;
-  Clause *c =NULL;
-  Variable v;
-  for (v.id = 0; v.id < 4;v.id++)
-      push_var(&c,v);
-  push_clause(&f,c);
-  free_clause(&c);
-  for (v.id = 4; v.id < 8;v.id++)
-      push_var(&c,v);
-  push_clause(&f,c);
-  free_clause(&c);
-  for (v.id = 8; v.id < 12;v.id++)
-      push_var(&c,v);
-  push_clause(&f,c);
 
-  print_formule(f);
-  free_formule(&f);
-  */
-Clause * c = NULL;
- Variable v;
+  /* Test new_formule : retourne une formule */
+  /* Cas : initialisé */
+  Formule f1 = new_formule();
+
+  /* Cas : initialisé avec NULL */
+  Formule * f2 = NULL;
+
+  /* Cas : non initialisé */
+  Formule f3;
+
+  Clause * c = NULL;
+
+  
+
+  /* Test is_empty_formule : retourne un booléen */
+
+  /* Résultat attendu : 0 */
+  printf("%i\n",is_empty_formule(&f1));
+
+  /* Résultat attendu : 1 */
+  printf("%i\n",is_empty_formule(f2));
+
+  /* Résultat attendu : 0 */
+  printf("%i\n",is_empty_formule(&f3));
+
+  /* Test count_var_in_formule : retourne un entier */
+  /* Résultat attendu : 4 */
+
+  /* Test count_clauses_in_formule : retourne un entier */
+  /* Résultat attendu : 1 */ 
+
+  Variable v;
   Formule * f4 = NULL;
 
   for(v.id = 0; v.id < 4; v.id++)
 	push_var(&c,v);
 
 	push_clause(&f4,c);
+	printf("nombre de var = %i\n",count_var_in_formule(f4));
+	printf("nombre de clauses = %i\n",count_clauses_in_formule(f4));
 	free_clause(&c);
-	printf("%i\n",count_var_in_formule(f4));
 	
+  
+ 
+ 
   return 0;
   #endif
 }
