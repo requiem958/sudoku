@@ -67,7 +67,7 @@ static void write_dimacs(char *filename, Formule *f, int nb_var){
   FILE *df = fopen(filename,"w");
   Clause *c;
   //Entete du fichier dimacs
-  fprintf(df,"p cnf %d %d\n", nb_var, count_clause_in_formule(f));
+  fprintf(df,"p cnf %d %d\n", nb_var, count_clauses_in_formule(f));
   //corps du fichier dimacs
   for(; f != NULL; f = f->next){
     for(c = f->c; c != NULL; c = c->next){
@@ -112,7 +112,7 @@ static void read_sudoku(char *filename, Formule **f){
   }
 
   //Second part : Gen constraint 2 (Line unicity)
-  for(l=0; i < s.taille; l++){
+  for(l=0; l < s.taille; l++){
     v.l=l;
     for(c=0; c < s.taille; c++){
       v.c = c;
@@ -142,7 +142,7 @@ static void read_sudoku(char *filename, Formule **f){
 
   //Third part  : Gen constraint 3 (Column unicity)
   
-  for(l=0; i < s.taille; i++){
+  for(l=0; l< s.taille; l++){
     v.l=l;
     for(c=0; c < s.taille; c++){
       v.c = c;
@@ -239,7 +239,7 @@ static void read_sudoku(char *filename, Formule **f){
       }
     }
   }
-  to_3sat(f);
+  to_3sat(f );
   /* Et maintenant je me dis que c'est enfin fini pour cette fonction sauf que j'y ai fait aucun test, zero, nada
      et qu'elle ne compile surement pas*/
   /* Et la maintenant que j'ai fait une simili-optimisation du code je me met à me dire que ça va tout péter*/
@@ -249,6 +249,9 @@ static void read_sudoku(char *filename, Formule **f){
 static void write_sudoku(char *filename, Formule *f, int sudoku_size){
   FILE *df = fopen(filename,"w");
   fclose(df);
+	  
+  f=f;
   f = NULL;
   sudoku_size = 0;
+   sudoku_size = sudoku_size;
 }
