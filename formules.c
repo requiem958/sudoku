@@ -92,6 +92,8 @@ static Variable* init_fvar (unsigned int ind){
 	return a;
 }
 #define initc(x) x =(Clause *) malloc(sizeof(Clause));x->next =(Clause *) malloc(sizeof(Clause));x->next->next =(Clause *) malloc(sizeof(Clause))
+#define initv(x,y) x = init_fvar (ind);y=init_fvar (ind);y->neg=0;ind--;
+
 
 void to_3sat(Formule **f){
 	unsigned int  ind,ln,i;
@@ -102,14 +104,8 @@ void to_3sat(Formule **f){
 		ln = length((*f)->c);
 		if (length((*f)->c)==1){
 			initc(x);
-			a = init_fvar (ind);
-			Na=init_fvar (ind);
-			Na->neg=0;
-			ind--;
-			b = init_fvar (ind);
-			Nb=init_fvar (ind);
-			Nb->neg=0;
-			ind--;
+			initv(a,Na);
+			initv(b,Nb);
 			// cas -z1 y1 -z2 
 			(*f)->c->next->v= *a;
 			(*f)->c->next->next->v=*b;
@@ -130,10 +126,7 @@ void to_3sat(Formule **f){
 			push_clause(f,x);
 		}else if (length ((*f)->c)==2){
 			 initc(x);
-			a = init_fvar (ind);
-			Na=init_fvar (ind);
-			Na->neg=0;;
-			ind--;
+			initv(a,Na);
 			// cas y1 y2 z1
 			(*f)->c->next->next->v=*a;
 			//cas y1 y2 -z1
@@ -143,19 +136,13 @@ void to_3sat(Formule **f){
 			push_clause(f,x);
 		}else if (length ((*f)->c)>3){
 			w =(Clause *) malloc(sizeof(Clause));//y1 y2 z1
-			a = init_fvar (ind);
-			Na=init_fvar (ind);
-			Na->neg=0;;
-			ind--;
+			initv(a,Na);
 			w= (*f)->c->next->next;
 			(*f)->c->next->next->v= *a;
 			(*f)->c->next->next->next=NULL;
 			for (i=4;i<ln;i++){// -zk-2 yk zk-1
 				initc(x);
-				b = init_fvar (ind);
-				Nb=init_fvar (ind);
-				Nb->neg=0;
-				ind--;
+				initv(b,Nb);
 				x->v= *Na;
 				x->next->v=w->v;
 				w=w->next;
@@ -171,6 +158,8 @@ void to_3sat(Formule **f){
 			push_clause(f,x);
 		}
 		*f=(*f)->next;
+		free(&c);
+		free(&v);
 	}
 //Au fait l'algo est : http://inf242.forge.imag.fr/SAT-3SAT-and-other-red.pdf
 }
