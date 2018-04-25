@@ -30,7 +30,7 @@
 #endif
 
 int main(void){
-  #ifdef TEST_CLAUSES
+#ifdef TEST_CLAUSES
   Clause *c = NULL;
   Clause *c2 = NULL;
   Variable v = {0,0,0,0,false};
@@ -87,8 +87,8 @@ int main(void){
   free_clause(&c);
   printf("le : %d\n",length(c));
   return 0;
-  #endif
-  #ifdef TEST_NUMBCOORD
+#endif
+#ifdef TEST_NUMBCOORD
 #define SUDOKU_SIZE 9
   int l=0,c=0,n=1;
   int number=0;
@@ -117,6 +117,7 @@ int main(void){
     puts("Il manque des valeurs");
   
   return 0;
+<<<<<<< HEAD
   #endif
   #ifdef TEST_FORM
 
@@ -148,12 +149,37 @@ int main(void){
   /* Résultat attendu : 1 */ 
 
    Clause * c = NULL;
+=======
+#endif
+#ifdef TEST_FORM
+  /*
+    Formule *f=NULL;
+    Clause *c =NULL;
+    Variable v;
+    for (v.id = 0; v.id < 4;v.id++)
+    push_var(&c,v);
+    push_clause(&f,c);
+    free_clause(&c);
+    for (v.id = 4; v.id < 8;v.id++)
+    push_var(&c,v);
+    push_clause(&f,c);
+    free_clause(&c);
+    for (v.id = 8; v.id < 12;v.id++)
+    push_var(&c,v);
+    push_clause(&f,c);
+
+    print_formule(f);
+    free_formule(&f);
+  */
+>>>>>>> master
   Variable v;
   Formule * f4 = NULL;
+  Clause *c = NULL;
 
   for(v.id = 0; v.id < 4; v.id++)
-	push_var(&c,v);
+    push_var(&c,v);
 
+<<<<<<< HEAD
 	push_clause(&f4,c);
 	printf("nombre de var = %i\n",count_var_in_formule(f4));
 	printf("nombre de clauses = %i\n\n",count_clauses_in_formule(f4));
@@ -237,6 +263,11 @@ int main(void){
    /* Test sudoku_to_dimacs */
   printf("Test final\n");
   sudoku_to_dimacs("dim.txt","sudoku.txt");
+=======
+  push_clause(&f4,c);
+  free_clause(&c);
+  printf("%i\n",count_var_in_formule(f4));
+>>>>>>> master
   return 0;
-  #endif
+#endif
 }
