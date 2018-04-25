@@ -82,84 +82,91 @@ void print_formule(const Formule *f){
   }
 }
 
-static Variable* init_fvar (unsigned int ind){
-	 Variable *a= (Variable*) malloc(sizeof(Variable));
-	a->id = ind ;
-	a->n=-1;
-	a->l=-1;
-	a->c=-1;
-	a->neg=1;
-	return a;
+static Variable init_fvar (unsigned int ind){
+  Variable a;
+  a->id = ind ;
+  a->n=-1;
+  a->l=-1;
+  a->c=-1;
+  a->neg=true;
+  return a;
 }
 #define initc(x) x =(Clause *) malloc(sizeof(Clause));x->next =(Clause *) malloc(sizeof(Clause));x->next->next =(Clause *) malloc(sizeof(Clause))
-#define initv(x,y) x = init_fvar (ind);y=init_fvar (ind);y->neg=0;ind--;
+#define initv(x,y) x = init_fvar (ind);y=init_fvar (ind);y->neg=false;ind++;
 
 
 void to_3sat(Formule **f){
-	unsigned int  ind,ln,i;
-	Clause *x,*w;
-	Variable *a,*b,*Na,*Nb;
-	ind=-1;
-	while (f!=NULL){
-		ln = length((*f)->c);
-		if (length((*f)->c)==1){
-			initc(x);
-			initv(a,Na);
-			initv(b,Nb);
-			// cas -z1 y1 -z2 
-			(*f)->c->next->v= *a;
-			(*f)->c->next->next->v=*b;
-			// cas z1 y1 z2
-			x->v= *a;
-			x->next->v= (*f)->c->v;
-			x->next->next->v=*b;
-			push_clause(f,x);
-			initc(x);// cas -z1 y1 z2
-			x->v= *a;
-			x->next->v= (*f)->c->v;
-			x->next->next->v=*b;
-			push_clause(f,x);
-			initc(x);// cas z1 y1 -z2
-			x->v= *a;
-			x->next->v= (*f)->c->v;
-			x->next->next->v=*b;
-			push_clause(f,x);
-		}else if (length ((*f)->c)==2){
-			 initc(x);
-			initv(a,Na);
-			// cas y1 y2 z1
-			(*f)->c->next->next->v=*a;
-			//cas y1 y2 -z1
-			x->v= *Na;
-			x->next->v= (*f)->c->v;
-			x->next->next->v=(*f)->c->next->v;
-			push_clause(f,x);
-		}else if (length ((*f)->c)>3){
-			w =(Clause *) malloc(sizeof(Clause));//y1 y2 z1
-			initv(a,Na);
-			w= (*f)->c->next->next;
-			(*f)->c->next->next->v= *a;
-			(*f)->c->next->next->next=NULL;
-			for (i=4;i<ln;i++){// -zk-2 yk zk-1
-				initc(x);
-				initv(b,Nb);
-				x->v= *Na;
-				x->next->v=w->v;
-				w=w->next;
-				x->next->next->v=*b;
-				a=b;
-				Na=Nb;
-				push_clause(f,x);
-			}
-			initc(x);// yn zn zn+1
-			x->v=*Na;
-			x->next->v=w->v;
-			x->next->next->v=w->next->v;
-			push_clause(f,x);
-		}
-		*f=(*f)->next;
-		free(&c);
-		free(&v);
-	}
-//Au fait l'algo est : http://inf242.forge.imag.fr/SAT-3SAT-and-other-red.pdf
+  const Formule *head = *f;
+  unsigned int  ind,ln,i;
+  Clause *x,*w;
+  Variable *a,*b,*Na,*Nb;
+  //Pour l'écriture dans le fichier dimacs on peut pas avoir des indices négatifs, donc on prend des indices
+  //Strictement supérieurs à l'indice max possible, or formule est déjà entiérement rempli donc l'indice max est le nombre de var <=> nb indice
+  ind=count_var_in_formule(*f)+1;
+  while (*f!=NULL){
+    ln = length((*f)->c);
+    
+    if (ln==1){
+      initc(x);
+      initv(a,Na);
+      initv(b,Nb);
+      // cas -z1 y1 -z2
+      push_var(&((*f)->c->next), *a);
+      push_var(&((*f)->c->next), *b);
+      // cas z1 y1 z2
+      x->v= *a;
+      x->next->v= (*f)->c->v;
+      x->next->next->v=*b;
+      push_clause(f,x);
+      initc(x);// cas -z1 y1 z2
+      x->v= *a;
+      x->next->v= (*f)->c->v;
+      x->next->next->v=*b;
+      push_clause(f,x);
+      initc(x);// cas z1 y1 -z2
+      x->v= *a;
+      x->next->v= (*f)->c->v;
+      x->next->next->v=*b;
+      push_clause(f,x);
+    }else if (ln==2){
+      initc(x);
+      initv(a,Na);
+      // cas y1 y2 z1
+      (*f)->c->next->next->v=*a;
+      //cas y1 y2 -z1
+      x->v= *Na;
+      x->next->v= (*f)->c->v;
+      x->next->next->v=(*f)->c->next->v;
+      push_clause(f,x);
+    }else if (ln>3){
+      w =(Clause *) malloc(sizeof(Clause));//y1 y2 z1
+      initv(a,Na);
+      w= (*f)->c->next->next;
+      (*f)->c->next->next->v= *a;
+      (*f)->c->next->next->next=NULL;
+      for (i=4;i<ln;i++){// -zk-2 yk zk-1
+	initc(x);
+	initv(b,Nb);
+	x->v= *Na;
+	x->next->v=w->v;
+	w=w->next;
+	x->next->next->v=*b;
+	a=b;
+	Na=Nb;
+	push_clause(f,x);
+      }
+      initc(x);// yn zn zn+1
+      x->v=*Na;
+      x->next->v=w->v;
+      x->next->next->v=w->next->v;
+      push_clause(f,x);
+    }
+    f=&(*f)->next;
+    free_clause(&c);
+    free(a);
+    free(b);
+    free(Na);
+    free(Nb);
+  }
+  //Au fait l'algo est : http://inf242.forge.imag.fr/SAT-3SAT-and-other-red.pdf
 }
