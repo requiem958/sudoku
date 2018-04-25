@@ -24,11 +24,13 @@
 #include "types.h"
 #include "clauses.h"
 #include "formules.h"
+#include "liresudoku.h"
+#include "to_dimacs.h"
 
 #endif
 
 int main(void){
-#ifdef TEST_CLAUSES
+  #ifdef TEST_CLAUSES
   Clause *c = NULL;
   Clause *c2 = NULL;
   Variable v = {0,0,0,0,false};
@@ -85,8 +87,8 @@ int main(void){
   free_clause(&c);
   printf("le : %d\n",length(c));
   return 0;
-#endif
-#ifdef TEST_NUMBCOORD
+  #endif
+  #ifdef TEST_NUMBCOORD
 #define SUDOKU_SIZE 9
   int l=0,c=0,n=1;
   int number=0;
@@ -115,8 +117,8 @@ int main(void){
     puts("Il manque des valeurs");
   
   return 0;
-#endif
-#ifdef TEST_FORM
+  #endif
+  #ifdef TEST_FORM
 
   /* Test new_formule : retourne une formule vide */
   /* Cas : initialisé */
@@ -145,17 +147,17 @@ int main(void){
   /* Test count_clauses_in_formule : retourne un entier */
   /* Résultat attendu : 1 */ 
 
-  Clause * c = NULL;
+   Clause * c = NULL;
   Variable v;
   Formule * f4 = NULL;
 
   for(v.id = 0; v.id < 4; v.id++)
-    push_var(&c,v);
+	push_var(&c,v);
 
-  push_clause(&f4,c);
-  printf("nombre de var = %i\n",count_var_in_formule(f4));
-  printf("nombre de clauses = %i\n\n",count_clauses_in_formule(f4));
-  free_clause(&c);
+	push_clause(&f4,c);
+	printf("nombre de var = %i\n",count_var_in_formule(f4));
+	printf("nombre de clauses = %i\n\n",count_clauses_in_formule(f4));
+	free_clause(&c);
 
   /* Test new_clause : retourne une clause vide */
   /* Test length : retourne un entier */
@@ -164,10 +166,10 @@ int main(void){
 
   Clause * c2 = NULL;
 
-
   for(v1.id = 0; v1.id < 4; v1.id++)
-    push_var(&c2,v1);
-//A ce point ci, v1.id = 4, car on sort du for dès que v1.id >=4
+	push_var(&c2,v1);
+  push_var(&c2,v1);
+
   printf("Clause c2 , taile (%i) : \n",length(c2));
   print_clause(c2);
   printf("\n");
@@ -176,39 +178,73 @@ int main(void){
   Clause * c3 = NULL;
 
   c3 = clause_copy(c2);
-
+	
   printf("Clause c3 , taille(%i) : \n",length(c3));
   print_clause(c3);
   printf("\n");
 
   /* Test pop_var : retourne un entier */
+  /* Résultat attendu : 0  */ 
+  /* printf("Clause c3, on retire la dernière variable  : %i \n\n",pop_var(c3,&v1)); */
 
-  v1.id = 0;
-  printf("Clause c3, variable à suppr (id) : %i \n\n",v1.id);
   /* Test del_var : retroune une clause moins la variable donnée */
-  c3 = del_var(&c3,v1);
+  /* c3 = del_var(&c3,v1); */
 
-  print_clause(c3);
+  /* Test equal_clause : retourne un booléen */
+  /* Résultat attendu sans del_var(&c3,v1) : true */
+  /* Résultat attendu avec del_var(&c3,v1) : false */
+  bool res = equal_clause(c2,c3);
+  if ( res == true ) printf("c2 et c3 sont égales \n\n");
+  else 		     printf("c2 et c3 ne sont pas égales \n\n");
 
-  /* Test pop_var : retourne un entier */
-  v1.id = 2;
-  printf("Clause c3, variable à suppr (id) : %i \n\n",v1.id);
-  /* Test del_var : retroune une clause moins la variable donnée */
-  c3 = del_var(&c3,v1);
 
-  print_clause(c3);
+   /* Test is_valid : retourne un booléen */
+   Variable v2;	
+   Clause * c4 = NULL;
 
-  v1.id = 1;
-  /* Test del_var : retroune une clause moins la variable donnée */
-  c3 = del_var(&c3,v1);
+   v2.id = 0;
+   push_var(&c4,v2);
+	
+   v2.neg = false;
+   push_var(&c4,v2);
 
-  print_clause(c3);
+   print_clause(c4);
 
-  v1.id = 3;
-  /* Test del_var : retroune une clause moins la variable donnée */
-  c3 = del_var(&c3,v1);
+  /* Résultat attendu pour c4 : true */
+  bool res1 = is_valid(c4);
+  if ( res1 == true ) printf("c4 est valide\n\n");
+  else 		      printf("c4 n'est pas valide \n\n");
 
-  print_clause(c3);
+  /* Résultat attendu pour c3 : false */
+  res1 = is_valid(c3);
+  if ( res1 == true ) printf("c3 est valide\n\n");
+  else 		      printf("c3 n'est pas valide \n\n");
+
+
+  /* Test readsudokufile, affichergrille et writesudokufile */
+  sudoku P;
+
+  FILE * file1 = fopen("sudoku.txt","r");
+  FILE * file2 = fopen("sudoku1.txt","w");
+ 
+  readsudokufile(file1,&P);
+  affichergrille(&P);
+  writesudokufile(file2,&P);
+
+  fclose(file1);
+  fclose(file2);
+
+
+   /* Test sudoku_to_dimacs */
+  
+  sudoku_to_dimacs("dim.txt","sudoku.txt");
+
+  
+   
+
+
+ 
+ 
   return 0;
-#endif
+  #endif
 }
