@@ -19,21 +19,22 @@ static void write_sudoku(char *filename, Formule *f, int sudoku_size);
 
 //Convertit une coordonÃ©e (l,c,n) en un nombre entier, selon la taille du sudoku
 unsigned int coord_to_number(unsigned int l, unsigned int c, unsigned int n, unsigned int sudoku_size){
-  //Le n-1 permet d'assurer qu'on ai jamais deux fois la meme valeur
-  return (n-1) + c*sudoku_size + l*sudoku_size*sudoku_size;
+  //Le sudoku size +1 permet d'eviter des doublets non liants
+  //Les indices commencent à 1
+  return n + c*(sudoku_size+1) + l*(sudoku_size+1)*(sudoku_size+1);
 }
 
 //Convertit un nombre en (l,c,n) selon la taille du sudoku;
 int number_to_coord(unsigned int number, unsigned int *l, unsigned int *c, unsigned int *n, unsigned int sudoku_size){
-  *n = 1 + number % sudoku_size;
+  *n = 1 + number % (sudoku_size+1);
   number -= (*n)-1;
 
-  *c = (number % (sudoku_size*sudoku_size))/sudoku_size;
-  number -= (*c)*sudoku_size;
+  *c = (number % ((sudoku_size+1)*(sudoku_size+1)))/(sudoku_size+1);
+  number -= (*c)*(sudoku_size+1);
 
-  *l = number/(sudoku_size*sudoku_size);
+  *l = number/((sudoku_size+1)*(sudoku_size+1));
 
-  return (*n)-1 + (*c)*sudoku_size + (*l)*sudoku_size*sudoku_size;
+  return (*n) + (*c)*(sudoku_size+1) + (*l)*(sudoku_size+1)*(sudoku_size+1);
 }
 
 void dimacs_to_sudoku(char *dimacs_file, char *sudoku_file){
@@ -44,7 +45,7 @@ void dimacs_to_sudoku(char *dimacs_file, char *sudoku_file){
 }
 
 void sudoku_to_dimacs(char *dimacs_file, char *sudoku_file){
-  Formule *f;
+  Formule *f = NULL;
   read_sudoku(sudoku_file,&f);
   write_dimacs(dimacs_file,f,count_var_in_formule(f));
   free_formule(&f);
@@ -82,7 +83,7 @@ static void write_dimacs(char *filename, Formule *f, int nb_var){
 
 //Convertit le fichier sudoku en formule 3-sat
 static void read_sudoku(char *filename, Formule **f){
-  FILE *df = fopen(filename,"w");
+  FILE *df = fopen(filename,"r");
   sudoku s;
   Clause *clause = NULL;
   Variable v,v2;;

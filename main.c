@@ -234,17 +234,9 @@ int main(void){
   fclose(file1);
   fclose(file2);
 
-
    /* Test sudoku_to_dimacs */
-  
+  printf("Test final\n");
   sudoku_to_dimacs("dim.txt","sudoku.txt");
-
-  
-   
-
-
- 
- 
   return 0;
   #endif
 }
