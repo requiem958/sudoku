@@ -9,7 +9,7 @@
 static void read_dimacs(char *filename, Formule **f);
 
 //Ecrit le fichier dimacs correspondant à la Formule f
-static void write_dimacs(char *filename, Formule *f, int nb_var);
+static void write_dimacs(char *filename, Formule *f);
 
 //Convertit le fichier sudoku en Formule
 static void read_sudoku(char *filename, Formule **f);
@@ -47,7 +47,7 @@ void dimacs_to_sudoku(char *dimacs_file, char *sudoku_file){
 void sudoku_to_dimacs(char *dimacs_file, char *sudoku_file){
   Formule *f = NULL;
   read_sudoku(sudoku_file,&f);
-  write_dimacs(dimacs_file,f,count_var_in_formule(f));
+  write_dimacs(dimacs_file,f);
   free_formule(&f);
 }
 
@@ -64,11 +64,11 @@ static void read_dimacs(char *filename, Formule **f){
 }
 
 //Ecrit le fichier dimacs correspondant à la formule f (préalablement convertie en 3-sat)
-static void write_dimacs(char *filename, Formule *f, int nb_var){
+static void write_dimacs(char *filename, Formule *f){
   FILE *df = fopen(filename,"w");
   Clause *c;
   //Entete du fichier dimacs
-  fprintf(df,"p cnf %d %d\n", nb_var, count_clauses_in_formule(f));
+  fprintf(df,"p cnf %d %d\n", count_var_in_formule(f), count_clauses_in_formule(f));
   //corps du fichier dimacs
   for(; f != NULL; f = f->next){
     for(c = f->c; c != NULL; c = c->next){

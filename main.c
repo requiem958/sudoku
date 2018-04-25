@@ -117,12 +117,15 @@ int main(void){
     puts("Il manque des valeurs");
   
   return 0;
-<<<<<<< HEAD
-  #endif
-  #ifdef TEST_FORM
+#endif
+#ifdef TEST_FORM
+
+  Clause * c = NULL;
+  Variable v;
+  Formule * f4 = NULL;
 
   /* Test new_formule : retourne une formule vide */
-  /* Cas : initialisé */
+  /* Cas : initialis� */
   Formule f1 = new_formule();
 
   /* Cas : initialisé avec NULL */
@@ -142,58 +145,29 @@ int main(void){
   /* Résultat attendu : 0 */
   printf("%i\n",is_empty_formule(&f3));
 
+  for(v.id = 0; v.id < 4; v.id++)
+    push_var(&c,v);
+
   /* Test count_var_in_formule : retourne un entier */
   /* Résultat attendu : 4 */
 
   /* Test count_clauses_in_formule : retourne un entier */
   /* Résultat attendu : 1 */ 
-
-   Clause * c = NULL;
-=======
-#endif
-#ifdef TEST_FORM
-  /*
-    Formule *f=NULL;
-    Clause *c =NULL;
-    Variable v;
-    for (v.id = 0; v.id < 4;v.id++)
-    push_var(&c,v);
-    push_clause(&f,c);
-    free_clause(&c);
-    for (v.id = 4; v.id < 8;v.id++)
-    push_var(&c,v);
-    push_clause(&f,c);
-    free_clause(&c);
-    for (v.id = 8; v.id < 12;v.id++)
-    push_var(&c,v);
-    push_clause(&f,c);
-
-    print_formule(f);
-    free_formule(&f);
-  */
->>>>>>> master
-  Variable v;
-  Formule * f4 = NULL;
-  Clause *c = NULL;
-
-  for(v.id = 0; v.id < 4; v.id++)
-    push_var(&c,v);
-
-<<<<<<< HEAD
-	push_clause(&f4,c);
-	printf("nombre de var = %i\n",count_var_in_formule(f4));
-	printf("nombre de clauses = %i\n\n",count_clauses_in_formule(f4));
-	free_clause(&c);
+  push_clause(&f4,c);
+  printf("nombre de var = %i\n",count_var_in_formule(f4));
+  printf("nombre de clauses = %i\n\n",count_clauses_in_formule(f4));
+  free_clause(&c);
 
   /* Test new_clause : retourne une clause vide */
-  /* Test length : retourne un entier */
+
   Variable v1;
-  Clause  c1 = new_clause();
 
   Clause * c2 = NULL;
+  /* Test length : retourne un entier */
+  
 
   for(v1.id = 0; v1.id < 4; v1.id++)
-	push_var(&c2,v1);
+    push_var(&c2,v1);
   push_var(&c2,v1);
 
   printf("Clause c2 , taile (%i) : \n",length(c2));
@@ -224,17 +198,17 @@ int main(void){
   else 		     printf("c2 et c3 ne sont pas égales \n\n");
 
 
-   /* Test is_valid : retourne un booléen */
-   Variable v2;	
-   Clause * c4 = NULL;
+  /* Test is_valid : retourne un booléen */
+  Variable v2;	
+  Clause * c4 = NULL;
 
-   v2.id = 0;
-   push_var(&c4,v2);
+  v2.id = 0;
+  push_var(&c4,v2);
 	
-   v2.neg = false;
-   push_var(&c4,v2);
+  v2.neg = false;
+  push_var(&c4,v2);
 
-   print_clause(c4);
+  print_clause(c4);
 
   /* Résultat attendu pour c4 : true */
   bool res1 = is_valid(c4);
@@ -260,14 +234,9 @@ int main(void){
   fclose(file1);
   fclose(file2);
 
-   /* Test sudoku_to_dimacs */
+  /* Test sudoku_to_dimacs */
   printf("Test final\n");
   sudoku_to_dimacs("dim.txt","sudoku.txt");
-=======
-  push_clause(&f4,c);
-  free_clause(&c);
-  printf("%i\n",count_var_in_formule(f4));
->>>>>>> master
   return 0;
 #endif
 }

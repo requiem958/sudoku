@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "to_dimacs.h"
+#include "liresudoku.h"
 #include "formules.h"
 
-
-static Variable* init_fvar (unsigned int ind);
 /* Sections formules */
 
 Formule new_formule(void){
@@ -23,11 +23,7 @@ int count_var_in_formule(const Formule * f){
   Clause *c_iter = NULL;
   int l=0;
   for(; f != NULL; f = f->next)
-<<<<<<< HEAD
     for (c_iter = f->c; c_iter != NULL; c_iter = c_iter->next)
-=======
-    for (c_iter = f->c; c_iter != NULL; c_iter=c_iter->next)
->>>>>>> master
       push_var(&distinct_var,c_iter->v);
   //On utilise le fait que push_var n'ajoute une variable que si elle n'est pas présente
   l = length(distinct_var);
@@ -88,89 +84,94 @@ void print_formule(const Formule *f){
 
 static Variable init_fvar (unsigned int ind){
   Variable a;
-  a->id = ind ;
-  a->n=-1;
-  a->l=-1;
-  a->c=-1;
-  a->neg=true;
+  a.id = ind ;
+  a.n=-1;
+  a.l=-1;
+  a.c=-1;
+  a.neg=false;
   return a;
 }
-#define initc(x) x =(Clause *) malloc(sizeof(Clause));x->next =(Clause *) malloc(sizeof(Clause));x->next->next =(Clause *) malloc(sizeof(Clause))
-#define initv(x,y) x = init_fvar (ind);y=init_fvar (ind);y->neg=false;ind++;
+#define initv(x,y) x = init_fvar (ind);y=init_fvar (ind);y.neg=true;ind++;
 
 
 void to_3sat(Formule **f){
-  const Formule *head = *f;
+  Formule *iter = NULL;
   unsigned int  ind,ln,i;
-  Clause *x,*w;
-  Variable *a,*b,*Na,*Nb;
-  //Pour l'écriture dans le fichier dimacs on peut pas avoir des indices négatifs, donc on prend des indices
-  //Strictement supérieurs à l'indice max possible, or formule est déjà entiérement rempli donc l'indice max est le nombre de var <=> nb indice
-  ind=count_var_in_formule(*f)+1;
-  while (*f!=NULL){
-    ln = length((*f)->c);
-    
-    if (ln==1){
-      initc(x);
+  Clause *x=NULL,*w=NULL;
+  Variable a,Na;
+  Variable b,Nb;
+  ind=MAX*MAX*MAX+1;
+  for (iter = *f; iter != NULL; iter= iter->next){
+    switch(ln =length(iter->c)){
+    case 1:
+      /* Creation des variables fraiches */
+      initv(a,Na); //z1 et -z1
+      initv(b,Nb); //z2 et -z2
+      /* On ajoute � f les nouvelles clauses */
+      // Modification de la clause originale y1 -> -z1 y1 -z2
+      push_var(&iter->c->next, a);
+      push_var(&iter->c->next, b);
+      // Ajout de la clause  z1 y1 z2
+      push_var(&x,a);
+      push_var(&x,iter->c->v);
+      push_var(&x,b);
+      push_clause(f,x);
+      free_clause(&x);
+      // Ajout de la clause -z1 y1 z2
+      push_var(&x,Na);
+      push_var(&x,iter->c->v);
+      push_var(&x,b);
+      push_clause(f,x);
+      free_clause(&x);
+      // Ajout de la clause  z1 y1 -z2
+      push_var(&x,a);
+      push_var(&x,iter->c->v);
+      push_var(&x,Nb);
+      push_clause(f,x);
+      break;
+    case 2:
       initv(a,Na);
-      initv(b,Nb);
-      // cas -z1 y1 -z2
-      push_var(&((*f)->c->next), *a);
-      push_var(&((*f)->c->next), *b);
-      // cas z1 y1 z2
-      x->v= *a;
-      x->next->v= (*f)->c->v;
-      x->next->next->v=*b;
+      // Modification de la clause originale y1 y2 -> y1 y2 z1
+      push_var(&iter->c,a);
+      // Ajout de la clause y1 y2 -z1
+      push_var(&x,iter->c->v);
+      push_var(&x,iter->c->next->v);
+      push_var(&x,Na);
       push_clause(f,x);
-      initc(x);// cas -z1 y1 z2
-      x->v= *a;
-      x->next->v= (*f)->c->v;
-      x->next->next->v=*b;
-      push_clause(f,x);
-      initc(x);// cas z1 y1 -z2
-      x->v= *a;
-      x->next->v= (*f)->c->v;
-      x->next->next->v=*b;
-      push_clause(f,x);
-    }else if (ln==2){
-      initc(x);
+      break;
+    case 3:
+      break;
+    default:
+      //Clause originale y1 y2 y3 ... yn
+      //On sauvegarde y3 ... yn
+      w = iter->c->next->next;
+      //On coupe le lien entre y2 et y3
+      iter->c->next->next = NULL;
+      // On cr�e z1 et -z1 qu'on va ajouter a y1 y2 -> y1 y2 z1
       initv(a,Na);
-      // cas y1 y2 z1
-      (*f)->c->next->next->v=*a;
-      //cas y1 y2 -z1
-      x->v= *Na;
-      x->next->v= (*f)->c->v;
-      x->next->next->v=(*f)->c->next->v;
-      push_clause(f,x);
-    }else if (ln>3){
-      w =(Clause *) malloc(sizeof(Clause));//y1 y2 z1
-      initv(a,Na);
-      w= (*f)->c->next->next;
-      (*f)->c->next->next->v= *a;
-      (*f)->c->next->next->next=NULL;
-      for (i=4;i<ln;i++){// -zk-2 yk zk-1
-	initc(x);
+      push_var(&iter->c,a);
+      for (i=4;i<ln;i++){// -z(i-3) y(i-1) z(i-2)
 	initv(b,Nb);
-	x->v= *Na;
-	x->next->v=w->v;
-	w=w->next;
-	x->next->next->v=*b;
+	push_var(&x,Na); //-z(i-3)
+	push_var(&x,w->v); //yi-1
+	push_var(&x,b); //z(i-2)
+	push_clause(f,x);
+	free_clause(&x);
+	
+	//z(i-3) <- z(i-2)
 	a=b;
 	Na=Nb;
-	push_clause(f,x);
+	//y(i-1) <- y(i)
+	w= del_var(&w,w->v);
       }
-      initc(x);// yn zn zn+1
-      x->v=*Na;
-      x->next->v=w->v;
-      x->next->next->v=w->next->v;
+      //Phase finale: -z(n-3) yn-1 yn
+      push_var(&x,Na);
+      push_var(&x,w->v);
+      push_var(&x,w->next->v);
       push_clause(f,x);
     }
-    f=&(*f)->next;
-    free_clause(&c);
-    free(a);
-    free(b);
-    free(Na);
-    free(Nb);
+    if (x != NULL)
+      free_clause(&x);
   }
   //Au fait l'algo est : http://inf242.forge.imag.fr/SAT-3SAT-and-other-red.pdf
 }
