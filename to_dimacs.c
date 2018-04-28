@@ -5,8 +5,8 @@
 #include "formules.h"
 #include "to_dimacs.h"
 
-//Convertit le fichier dimacs en Formule
-static void read_dimacs(char *filename, Formule **f);
+//Convertit le fichier dimacs en sudoku
+ static sudoku* read_dimacs(char *filename,unsigned  int sudoku_size);
 
 //Ecrit le fichier dimacs correspondant à la Formule f
 static void write_dimacs(char *filename, Formule *f);
@@ -14,8 +14,8 @@ static void write_dimacs(char *filename, Formule *f);
 //Convertit le fichier sudoku en Formule
 static void read_sudoku(char *filename, Formule **f);
 
-//Ecrit le fichier sudoku correspondant à la Formule f
-static void write_sudoku(char *filename, Formule *f, int sudoku_size);
+//Ecrit le fichier sudoku correspondant au sudoku a
+static void write_sudoku(char *filename,sudoku *a);
 
 //Convertit une coordonÃ©e (l,c,n) en un nombre entier, selon la taille du sudoku
 unsigned int coord_to_number(unsigned int l, unsigned int c, unsigned int n, unsigned int sudoku_size){
@@ -37,11 +37,10 @@ int number_to_coord(unsigned int number, unsigned int *l, unsigned int *c, unsig
   return (*n) + (*c)*(sudoku_size+1) + (*l)*(sudoku_size+1)*(sudoku_size+1);
 }
 
-void dimacs_to_sudoku(char *dimacs_file, char *sudoku_file){
-  Formule *f;
-  read_dimacs(dimacs_file, &f);
-  write_sudoku(sudoku_file, f,count_var_in_formule(f));
-  free_formule(&f);
+void dimacs_to_sudoku(char *dimacs_file, char *sudoku_file,unsigned int sudoku_size){
+  sudoku *a;
+  a=read_dimacs(dimacs_file,sudoku_size);
+  write_sudoku(sudoku_file,a);
 }
 
 void sudoku_to_dimacs(char *dimacs_file, char *sudoku_file){
@@ -53,16 +52,26 @@ void sudoku_to_dimacs(char *dimacs_file, char *sudoku_file){
 
 /* Fonctions locales */
 
-//Convertit le fichier dimacs en formule
-static void read_dimacs(char *filename, Formule **f){
+//Convertit le fichier dimacs en tableau sudoku
+ static sudoku* read_dimacs(char *filename,unsigned  int sudoku_size){
+	sudoku *a=(sudoku*) malloc(sizeof(sudoku));
+	unsigned int id,l,n,c;
+	char Sat;
+	a->taille = sudoku_size;
   FILE *df = fopen(filename,"r");
-  *f=NULL;
   if (df == NULL)
-    return;
-
-  //Lire chaque caractére du fichier dimacs pour le parser en formule
+    return a;
+ fscanf(df," %c",&Sat);
+ fscanf(df," %c",&Sat);
+ fscanf(df," %c",&Sat);
+ while (feof(df)){
+	 fscanf(df," %d",&id);
+	 if ( id > 0 && id < MAX*MAX*MAX){
+		number_to_coord(id,&l,&c,&n,a->taille);
+	a->grille[l][c]=n;
+	 }
+ }
 }
-
 //Ecrit le fichier dimacs correspondant à la formule f (préalablement convertie en 3-sat)
 static void write_dimacs(char *filename, Formule *f){
   FILE *df = fopen(filename,"w");
@@ -246,13 +255,20 @@ static void read_sudoku(char *filename, Formule **f){
   /* Et la maintenant que j'ai fait une simili-optimisation du code je me met à me dire que ça va tout péter*/
 }
 
-//Ecrit le fichier sudoku correspondant à la formule f
-static void write_sudoku(char *filename, Formule *f, int sudoku_size){
+
+//Ecrit le fichier sudoku correspondant aux sudoku dans un fichier
+static void write_sudoku(char *filename,sudoku *a){
   FILE *df = fopen(filename,"w");
-  fclose(df);
-	  
-  f=f;
-  f = NULL;
-  sudoku_size = 0;
-   sudoku_size = sudoku_size;
+ int i,j;
+  fprintf(df,"taille : %d * %d \n",a->taille,a->taille);  //affichage taille
+  for (i=0;i<a->taille;i++){
+    for(j=0;j<a->taille;j++){
+      fprintf(df,"%3d |",a->grille[i][j]); //affichage valeur sur 3chiffres
+    }
+    fprintf(df,"\n");
+    for(j=0;j<a->taille;j++){
+      fprintf(df,"---"); // presentation
+    }
+    fprintf (df,"\n");
+  }
 }
