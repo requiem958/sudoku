@@ -125,7 +125,11 @@ int main(void){
   Formule * f4 = NULL;
 
   /* Test new_formule : retourne une formule vide */
+<<<<<<< HEAD
   /* Cas : initialisà*/
+=======
+  /* Cas : initialis� */
+>>>>>>> master
   Formule f1 = new_formule();
 
   /* Cas : initialisé avec NULL */

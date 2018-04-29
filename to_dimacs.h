@@ -7,7 +7,7 @@ unsigned int coord_to_number(unsigned int l, unsigned int c, unsigned int n, uns
 int number_to_coord(unsigned int number, unsigned int *l, unsigned int *c, unsigned int *n, unsigned int sudoku_size);
 // renvoie la colone 
 
-void dimacs_to_sudoku(char *dimacs_file, char *sudoku_file);
+void dimacs_to_sudoku(char *dimacs_file, char *sudoku_file,unsigned int sudoku_size);
 //Ecrit le fichier sudoku correspondant à un fichier dimacs
 
 void sudoku_to_dimacs(char *dimacs_file, char *sudoku_file);
