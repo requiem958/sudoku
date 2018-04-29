@@ -47,6 +47,7 @@ int push_clause(Formule **f,Clause *c){
       return -1;
     }
     (*f)->c = clause_copy(c);
+    (*f)->next = NULL;
     return 0;
   }
   else if (equal_clause((*f)->c,c))

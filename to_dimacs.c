@@ -126,6 +126,7 @@ static void read_sudoku(char *filename, Formule **f){
   int sqrt;
   //On récupére dans s toutes les valeurs du fichier sudoku
   readsudokufile(df,&s);
+  fclose(df);
   //sqrt <- racine(s.taille) si s.taille est un carré, sinon -1
   sqrt = is_perfect_square(s.taille);
   //SI on choppe un -1 c'est quey'a un bleme on se casse
@@ -134,6 +135,7 @@ static void read_sudoku(char *filename, Formule **f){
   //Generation de la constraint 1 (Domaine)
   //On affecte à v et v2 les valeurs par défaut nul (Tout à 0, et variable non neg)
   v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0, .neg = false};
+  puts("Step 1");
   //Pour tout l dans [0,s.taille[
   for (l=0; l < s.taille; l++){
     v.l = l;
@@ -152,93 +154,97 @@ static void read_sudoku(char *filename, Formule **f){
       push_clause(f,clause);
       //On détruit la clausse
       free_clause(&clause);
-      clause = NULL;
     }
   }
-    //Gen constraint 2 (Line unicity)
-    v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0};
-    for(l=0; l < s.taille; l++){
-      v.l=l;
-      for(c=0; c < s.taille; c++){
-	v.c = c;
-	for(n=1; n <= s.taille; n++){
-	  //First var x[l,c,n]
-	  v.n=n;
-	  v.neg = true;
-	  v.id = coord_to_number(v.l,v.c,v.n, s.taille);
-	  //Or loops for each column
-	  for(i=0; i <= c-1; i++){
-	    push_var(&clause,v);
-	    v2 = (Variable){.l = v.l, .c = i, .n = v.n, .neg = true};
-	    v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
-	    push_var(&clause,v2);
-	    push_clause(f,clause);
-	    free_clause(&clause);
+  //Gen constraint 2 (Line unicity)
+  puts("Step 2");
+  v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0};
+  for(l=0; l < s.taille; l++){
+    printf("Compute row : %d\n",l);
+    v.l=l;
+    for(c=0; c < s.taille; c++){
+      printf("Compute col : %d\n",c);
+      v.c = c;
+      for(n=1; n <= s.taille; n++){
+	//First var x[l,c,n]
+	v.n=n;
+	v.neg = true;
+	v.id = coord_to_number(v.l,v.c,v.n, s.taille);
+	//Or loops for each column
+	for(i=0; i <= c-1; i++){
+	  push_var(&clause,v);
+	  v2 = (Variable){.l = v.l, .c = i, .n = v.n, .neg = true};
+	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
+	  push_var(&clause,v2);
+	  push_clause(f,clause);
+	  free_clause(&clause);
 	    
-	  }
-	  for(i=c+1; i < s.taille; i++){
-	    push_var(&clause,v);
-	    v2 = (Variable){.l = v.l, .c = i, .n = v.n, .neg = true};
-	    v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
-	    push_var(&clause,v2);
-	    push_clause(f,clause);
-	    free_clause(&clause);
-	  }
-	  clause = NULL;
+	}
+	for(i=c+1; i < s.taille; i++){
+	  push_var(&clause,v);
+	  v2 = (Variable){.l = v.l, .c = i, .n = v.n, .neg = true};
+	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
+	  push_var(&clause,v2);
+	  push_clause(f,clause);
+	  free_clause(&clause);
 	}
       }
     }
+  }
 
-    //Gen constraint 3 (Column unicity)
-    v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0};
-    for(l=0; l< s.taille; l++){
-      v.l=l;
-      for(c=0; c < s.taille; c++){
-	v.c = c;
-	for(n=1; n <= s.taille; n++){
-	  //First var x[l,c,n]
-	  v.n=n;
-	  v.neg = true;
-	  v.id = coord_to_number(v.l,v.c,v.n, s.taille);
-	  //Or loops for each line(imply)
-	  for(i=0; i <= l-1; i++){
-	    push_var(&clause,v);
-	    v2 = (Variable){.l = i, .c = v.c, .n = v.n, .neg = true};
-	    v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
-	    push_var(&clause,v2);
-	    push_clause(f,clause);
-	    free_clause(&clause);
-	  }
-	  for(i=l+1; i < s.taille; i++){
-	    push_var(&clause,v);
-	    v2 = (Variable){.l = i, .c = v.c, .n = v.n, .neg = true};
-	    v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
-	    push_var(&clause,v2);
-	    push_clause(f,clause);
-	    free_clause(&clause);
-	  }
+  //Gen constraint 3 (Column unicity)
+  puts("Step 3 !");
+  v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0};
+  v.neg = true;
+  for(l=0; l< s.taille; l++){
+    printf("Row : %d\n",l);
+    v.l=l;
+    for(c=0; c < s.taille; c++){
+      printf("Col : %d\n",c);
+      v.c = c;
+      for(n=1; n <= s.taille; n++){
+	//First var x[l,c,n]
+	v.n=n;
+	v.id = coord_to_number(v.l,v.c,v.n, s.taille);
+	//Or loops for each line(imply)
+	for(i=0; i <= l-1; i++){
+	  push_var(&clause,v);
+	  v2 = (Variable){.l = i, .c = v.c, .n = v.n, .neg = true};
+	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
+	  push_var(&clause,v2);
+	  push_clause(f,clause);
+	  free_clause(&clause);
+	}
+	for(i=l+1; i < s.taille; i++){
+	  push_var(&clause,v);
+	  v2 = (Variable){.l = i, .c = v.c, .n = v.n, .neg = true};
+	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
+	  push_var(&clause,v2);
+	  push_clause(f,clause);
+	  free_clause(&clause);
 	}
       }
     }
+  }
 
   //Gen constraint 4 (Square unicity)
 
+  puts("Step 4 !!!!");
   /* A ce point du code je me pose des questions sur à peu près tout, peut être faut-il mieux partir élever des
      chèvres dans le vercors qui sait ? */
   v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0,.neg=false};
   v.neg = v2.neg = true;
   for (l = 0; l <= sqrt-1;l++){
     v2.l = l*sqrt;
+    v.l= l*sqrt;
     for (c = 0; c <= sqrt-1;c++){
       v2.c = c*sqrt;
+      v.c= c*sqrt;
       for (n = 1 ; n <= s.taille; n++){
 	v2.n = n;
 	v2.id = coord_to_number(v2.l,v2.c,v2.n,s.taille);
-
 	// Var temp
 	v.n= n;
-	v.l= l*sqrt;
-	v.c= c*sqrt;
 	for(i = 1; i <= sqrt-1;i++){
 	  v.c =c*sqrt+ i;
 	  v.id = coord_to_number(v.l,v.c,v.n,s.taille);
@@ -279,6 +285,7 @@ static void read_sudoku(char *filename, Formule **f){
 
   /* A ce point ci je me demande quel est le pourcentage de code que j'aurais du vous laisser faire*/
 
+  puts("Step 6666666");
   v.neg = false;
   //Fifth part  : Gen sudoku corresponding clauses
   for (l=0; l < s.taille; l++){
@@ -297,6 +304,7 @@ static void read_sudoku(char *filename, Formule **f){
     }
   }
   //Transfo en 3sat
+  puts("Final gen step -> To 3 sat");
   to_3sat(f );
   /* Et maintenant je me dis que c'est enfin fini pour cette fonction sauf que j'y ai fait aucun test, zero, nada
      et qu'elle ne compile surement pas*/
@@ -319,4 +327,5 @@ static void write_sudoku(char *filename,sudoku *a){
     }
     fprintf (df,"\n");
   }
+  fclose(df);
 }

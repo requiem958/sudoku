@@ -39,6 +39,7 @@ int push_var(Clause **c, Variable v){
     if (!*c)
       return -1;
     (*c)->v = v;
+    (*c)->next = NULL;
     return 0;
   }
   else if (VAR_EQ(v,(*c)->v))
@@ -155,8 +156,6 @@ bool equal_clause(Clause *c1, Clause *c2){
   if (c1==c2 && c2==NULL)
     return true;
   else if ((!c1 && c2) || (c1 && !c2))
-    return false;
-  else if (length(c1) != length(c2))
     return false;
   else
     return equalcl(c1,c2);

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TEST_FORM
+#define TEST_SUDOKU
 
 #ifdef TEST_NUMBCOORD
 
@@ -27,6 +27,15 @@
 #include "liresudoku.h"
 #include "to_dimacs.h"
 
+#endif
+
+#ifdef TEST_SUDOKU
+
+#include "types.h"
+#include "clauses.h"
+#include "formules.h"
+#include "liresudoku.h"
+#include "to_dimacs.h"
 #endif
 
 int main(void){
@@ -216,6 +225,9 @@ int main(void){
   else 		      printf("c3 n'est pas valide \n\n");
 
 
+  return 0;
+#endif
+#ifdef TEST_SUDOKU
   /* Test readsudokufile, affichergrille et writesudokufile */
   sudoku P;
   FILE * file1 = fopen("sudoku.txt","r");
