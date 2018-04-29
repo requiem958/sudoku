@@ -90,6 +90,7 @@ static void read_dimacs(char *filename,unsigned  int sudoku_size, sudoku *a){
     }
     //Tant que le fichier est pas fini
   }while (!feof(df));
+  fclose(df);
 }
 //Ecrit le fichier dimacs correspondant à la formule f (préalablement convertie en 3-sat)
 static void write_dimacs(char *filename, Formule *f){
@@ -165,20 +166,24 @@ static void read_sudoku(char *filename, Formule **f){
 	  v.n=n;
 	  v.neg = true;
 	  v.id = coord_to_number(v.l,v.c,v.n, s.taille);
-	  push_var(&clause,v);
 	  //Or loops for each column
 	  for(i=0; i <= c-1; i++){
+	    push_var(&clause,v);
 	    v2 = (Variable){.l = v.l, .c = i, .n = v.n, .neg = true};
 	    v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
 	    push_var(&clause,v2);
+	    push_clause(f,clause);
+	    free_clause(&clause);
+	    
 	  }
 	  for(i=c+1; i < s.taille; i++){
+	    push_var(&clause,v);
 	    v2 = (Variable){.l = v.l, .c = i, .n = v.n, .neg = true};
 	    v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
 	    push_var(&clause,v2);
+	    push_clause(f,clause);
+	    free_clause(&clause);
 	  }
-	  push_clause(f,clause);
-	  free_clause(&clause);
 	  clause = NULL;
 	}
       }
@@ -195,21 +200,23 @@ static void read_sudoku(char *filename, Formule **f){
 	  v.n=n;
 	  v.neg = true;
 	  v.id = coord_to_number(v.l,v.c,v.n, s.taille);
-	  push_var(&clause,v);
 	  //Or loops for each line(imply)
 	  for(i=0; i <= l-1; i++){
+	    push_var(&clause,v);
 	    v2 = (Variable){.l = i, .c = v.c, .n = v.n, .neg = true};
 	    v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
 	    push_var(&clause,v2);
+	    push_clause(f,clause);
+	    free_clause(&clause);
 	  }
 	  for(i=l+1; i < s.taille; i++){
+	    push_var(&clause,v);
 	    v2 = (Variable){.l = i, .c = v.c, .n = v.n, .neg = true};
 	    v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
 	    push_var(&clause,v2);
+	    push_clause(f,clause);
+	    free_clause(&clause);
 	  }
-	  push_clause(f,clause);
-	  free_clause(&clause);
-	  clause = NULL;
 	}
       }
     }
