@@ -143,7 +143,7 @@ static void read_sudoku(char *filename, Formule **f){
 	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
 	  push_var(&clause,v2);
 	}
-	for(i=c+1; i <= s.taille; i++){
+	for(i=c+1; i < s.taille; i++){
 	  v2 = (Variable){.l = v.l, .c = i, .n = v.n, .neg = true};
 	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
 	  push_var(&clause,v2);
@@ -173,7 +173,7 @@ static void read_sudoku(char *filename, Formule **f){
 	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
 	  push_var(&clause,v2);
 	}
-	for(i=l+1; i <= s.taille; i++){
+	for(i=l+1; i < s.taille; i++){
 	  v2 = (Variable){.l = i, .c = v.c, .n = v.n, .neg = true};
 	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
 	  push_var(&clause,v2);
@@ -189,38 +189,40 @@ static void read_sudoku(char *filename, Formule **f){
   /* A ce point du code je me pose des questions sur à peu près tout, peut être faut-il mieux partir élever des
      chèvres dans le vercors qui sait ? */
   v.neg = v2.neg = true;
-  for (n = 1 ; n <= s.taille; n++){
-    v.n= v2.n = n;
-    for (l = 0; l < sqrt-1;l++){
-      v2.l = l*sqrt;
-      for (c = 0; c < sqrt-1;c++){
-	v2.c = c*sqrt;
+  for (l = 0; l <= sqrt-1;l++){
+    v2.l = l*sqrt;
+    for (c = 0; c <= sqrt-1;c++){
+      v2.c = c*sqrt;
+      for (n = 1 ; n <= s.taille; n++){
+	v2.n = n;
 	v2.id = coord_to_number(v2.l,v2.c,v2.n,s.taille);
-	
+
+	// Var temp
+	v.n= n;
+	v.l= l*sqrt;
+	v.c= c*sqrt;
 	for(i = 1; i <= sqrt-1;i++){
 	  v.c =c*sqrt+ i;
 	  v.id = coord_to_number(v.l,v.c,v.n,s.taille);
 	  push_var(&clause,v);
 	  push_var(&clause,v2);
+	  push_clause(f,clause);
+	  free_clause(&clause);
 	}
-	push_clause(f,clause);
-	free_clause(&clause);
-	
-	v.c = c*sqrt;
-	v.l = l*sqrt;
+
+	v.l= l*sqrt;
+	v.c= c*sqrt;
 	for(i = 1; i <= sqrt-1;i++){
 	  v.l = l*sqrt + i;
 	  v.id = coord_to_number(v.l,v.c,v.n,s.taille);
 	  push_var(&clause,v);
 	  push_var(&clause,v2);
+	  push_clause(f,clause);
+	  free_clause(&clause);
 	}
 
-	push_clause(f,clause);
-	free_clause(&clause);
-
-	v.c = c*sqrt;
-	v.l = l*sqrt;
-	
+	v.l= l*sqrt;
+	v.c= c*sqrt;
 	for(i=1; i <= sqrt-1; i++){
 	  v.l = l*sqrt+i;
 	  for(j=1; j <= sqrt-1; j++){
@@ -228,10 +230,10 @@ static void read_sudoku(char *filename, Formule **f){
 	    v.id = coord_to_number(v.l,v.c,v.n,s.taille);
 	    push_var(&clause,v);
 	    push_var(&clause,v2);
+	    push_clause(f,clause);
+	    free_clause(&clause);
 	  }
 	}
-	push_clause(f,clause);
-	free_clause(&clause);
       }
     }
   }
