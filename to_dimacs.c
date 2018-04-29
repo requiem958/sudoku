@@ -17,15 +17,18 @@ static void read_sudoku(char *filename, Formule **f);
 //Ecrit le fichier sudoku correspondant au sudoku a
 static void write_sudoku(char *filename,sudoku *a);
 
-//Convertit une coordonÃ©e (l,c,n) en un nombre entier, selon la taille du sudoku
+//Convertit une coordonÃ©e (l,c,n) en un nombre entier
 unsigned int coord_to_number(unsigned int l, unsigned int c, unsigned int n, unsigned int sudoku_size){
   //Le sudoku size +1 permet d'eviter des doublets non liants
   //Les indices commencent à 1
   return n + c*(MAX+1) + l*(MAX+1)*(MAX+1);
 }
 
-//Convertit un nombre en (l,c,n) selon la taille du sudoku;
+//Convertit un nombre en (l,c,n)
+//Les pointeurs sont des références
 int number_to_coord(unsigned int number, unsigned int *l, unsigned int *c, unsigned int *n, unsigned int sudoku_size){
+
+  //On affecte à n la valeur qui suit
   *n = number % (MAX+1);
   number -= *n;
 
@@ -34,12 +37,15 @@ int number_to_coord(unsigned int number, unsigned int *l, unsigned int *c, unsig
 
   *l = number/((MAX+1)*(MAX+1));
 
+  //On renvoit le nouvel id calculé qui doit être égal à l'ancien (number) sinon c'est que y'a un souci
   return (*n) + (*c)*(MAX+1) + (*l)*(MAX+1)*(MAX+1);
 }
 
 void dimacs_to_sudoku(char *dimacs_file, char *sudoku_file,unsigned int sudoku_size){
   sudoku a;
+  //On affecte à a la présente dans le fichier dimacs
   read_dimacs(dimacs_file,sudoku_size,&a);
+  //On l'écrit dans le fichier sudoku
   write_sudoku(sudoku_file,&a);
 }
 
@@ -57,24 +63,32 @@ static void read_dimacs(char *filename,unsigned  int sudoku_size, sudoku *a){
   int id;
   unsigned int l,n,c;
   char Sat;
-  a->taille = sudoku_size;
   FILE *df = fopen(filename,"r");
+  a->taille = sudoku_size;
   if (df == NULL)
     return;
+  //Lecture de l'entete et affichage
   fscanf(df," %c",&Sat);
   printf("%c",Sat);
   fscanf(df," %c",&Sat);
   printf("%c",Sat);
   fscanf(df," %c",&Sat);
   printf("%c",Sat);
+
+  //Lecture des variables
   do{
     fscanf(df," %d",&id);
+    //Si id est positif => on a une valeur à donner à la case
+    //Si id > coord_machin => C'est une fausse valeur générée par le to_3sat donc on la saute
     if ( id > 0 && (unsigned ) id < coord_to_number(sudoku_size-1,sudoku_size-1,sudoku_size,0)){
       printf("ID OK : %d\n",id);
+      //Test à ne pas pseudocoder
       if (number_to_coord((unsigned int) id,&l,&c,&n,a->taille) != id)
 	puts("Probleme avec cet id");
+      //On affecte la bonne valeur à la case dans le sudoku
       a->grille[l][c]=n;
     }
+    //Tant que le fichier est pas fini
   }while (!feof(df));
 }
 //Ecrit le fichier dimacs correspondant à la formule f (préalablement convertie en 3-sat)
@@ -84,12 +98,17 @@ static void write_dimacs(char *filename, Formule *f){
   //Entete du fichier dimacs
   fprintf(df,"p cnf %d %d\n", count_var_in_formule(f), count_clauses_in_formule(f));
   //corps du fichier dimacs
+  //Pour chaque clause de la formule
   for(; f != NULL; f = f->next){
+    //Pour chaque variable de clause
     for(c = f->c; c != NULL; c = c->next){
+      //Si elle est en négation on écrit le "-" cf doc dimacs
       if (c->v.neg)
 	fprintf(df,"-");
+      //Puis on écrit le numéro dimacs de la var
       fprintf(df,"%d ",c->v.id);
     }
+    //On finit la ligne (cf doc dimacs)
     fprintf(df,"0\n");
   }
   fclose(df);
@@ -104,11 +123,17 @@ static void read_sudoku(char *filename, Formule **f){
   int l,c,n;
   int i,j;
   int sqrt;
+  //On récupére dans s toutes les valeurs du fichier sudoku
   readsudokufile(df,&s);
+  //sqrt <- racine(s.taille) si s.taille est un carré, sinon -1
   sqrt = is_perfect_square(s.taille);
-  //Gen constraint 1 (Domain)
+  //SI on choppe un -1 c'est quey'a un bleme on se casse
+  if (sqrt < 0)
+    return;
+  //Generation de la constraint 1 (Domaine)
+  //On affecte à v et v2 les valeurs par défaut nul (Tout à 0, et variable non neg)
   v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0, .neg = false};
-  //Forall l
+  //Pour tout l dans [0,s.taille[
   for (l=0; l < s.taille; l++){
     v.l = l;
     //Forall c
@@ -116,11 +141,15 @@ static void read_sudoku(char *filename, Formule **f){
       v.c = c;
       //Exists n
       for (n = 1; n <= s.taille; n++){
+	//On crée la variable x[l,c,n]
 	v.n = n;
 	v.id = coord_to_number(v.l,v.c,v.n, s.taille);
+	//On l'ajoute à la clause courzante (si vide elle est créée)
 	push_var(&clause,v);
       }
+      //On ajoute la clause à l'ensemble de toutes les formules
       push_clause(f,clause);
+      //On détruit la clausse
       free_clause(&clause);
       clause = NULL;
     }
@@ -137,7 +166,7 @@ static void read_sudoku(char *filename, Formule **f){
 	  v.neg = true;
 	  v.id = coord_to_number(v.l,v.c,v.n, s.taille);
 	  push_var(&clause,v);
-	  //Or loops for each column(imply)
+	  //Or loops for each column
 	  for(i=0; i <= c-1; i++){
 	    v2 = (Variable){.l = v.l, .c = i, .n = v.n, .neg = true};
 	    v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
@@ -260,7 +289,8 @@ static void read_sudoku(char *filename, Formule **f){
       }
     }
   }
-  to_3sat(f );
+  //Transfo en 3sat
+  //to_3sat(f );
   /* Et maintenant je me dis que c'est enfin fini pour cette fonction sauf que j'y ai fait aucun test, zero, nada
      et qu'elle ne compile surement pas*/
   /* Et la maintenant que j'ai fait une simili-optimisation du code je me met à me dire que ça va tout péter*/
