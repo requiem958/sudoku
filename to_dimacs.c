@@ -107,7 +107,7 @@ static void read_sudoku(char *filename, Formule **f){
   readsudokufile(df,&s);
   sqrt = is_perfect_square(s.taille);
   //Gen constraint 1 (Domain)
-  v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0};
+  v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0, .neg = false};
   //Forall l
   for (l=0; l < s.taille; l++){
     v.l = l;
@@ -125,62 +125,6 @@ static void read_sudoku(char *filename, Formule **f){
       clause = NULL;
     }
   }
-
-  //Gen constraint 4 (Square unicity)
-
-  /* A ce point du code je me pose des questions sur à peu près tout, peut être faut-il mieux partir élever des
-     chèvres dans le vercors qui sait ? */
-  v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0};
-  v.neg = v2.neg = true;
-  for (l = 0; l <= sqrt-1;l++){
-    v2.l = l*sqrt;
-    for (c = 0; c <= sqrt-1;c++){
-      v2.c = c*sqrt;
-      for (n = 1 ; n <= s.taille; n++){
-	v2.n = n;
-	v2.id = coord_to_number(v2.l,v2.c,v2.n,s.taille);
-
-	// Var temp
-	v.n= n;
-	v.l= l*sqrt;
-	v.c= c*sqrt;
-	for(i = 1; i <= sqrt-1;i++){
-	  v.c =c*sqrt+ i;
-	  v.id = coord_to_number(v.l,v.c,v.n,s.taille);
-	  push_var(&clause,v);
-	  push_var(&clause,v2);
-	  push_clause(f,clause);
-	  free_clause(&clause);
-	}
-
-	v.l= l*sqrt;
-	v.c= c*sqrt;
-	for(i = 1; i <= sqrt-1;i++){
-	  v.l = l*sqrt + i;
-	  v.id = coord_to_number(v.l,v.c,v.n,s.taille);
-	  push_var(&clause,v);
-	  push_var(&clause,v2);
-	  push_clause(f,clause);
-	  free_clause(&clause);
-	}
-
-	v.l= l*sqrt;
-	v.c= c*sqrt;
-	for(i=1; i <= sqrt-1; i++){
-	  v.l = l*sqrt+i;
-	  for(j=1; j <= sqrt-1; j++){
-	    v.c = c*sqrt+j;
-	    v.id = coord_to_number(v.l,v.c,v.n,s.taille);
-	    push_var(&clause,v);
-	    push_var(&clause,v2);
-	    push_clause(f,clause);
-	    free_clause(&clause);
-	  }
-	}
-      }
-    }
-  
-
     //Gen constraint 2 (Line unicity)
     v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0};
     for(l=0; l < s.taille; l++){
@@ -240,10 +184,66 @@ static void read_sudoku(char *filename, Formule **f){
 	}
       }
     }
+
+  //Gen constraint 4 (Square unicity)
+
+  /* A ce point du code je me pose des questions sur à peu près tout, peut être faut-il mieux partir élever des
+     chèvres dans le vercors qui sait ? */
+  v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0,.neg=false};
+  v.neg = v2.neg = true;
+  for (l = 0; l <= sqrt-1;l++){
+    v2.l = l*sqrt;
+    for (c = 0; c <= sqrt-1;c++){
+      v2.c = c*sqrt;
+      for (n = 1 ; n <= s.taille; n++){
+	v2.n = n;
+	v2.id = coord_to_number(v2.l,v2.c,v2.n,s.taille);
+
+	// Var temp
+	v.n= n;
+	v.l= l*sqrt;
+	v.c= c*sqrt;
+	for(i = 1; i <= sqrt-1;i++){
+	  v.c =c*sqrt+ i;
+	  v.id = coord_to_number(v.l,v.c,v.n,s.taille);
+	  push_var(&clause,v);
+	  push_var(&clause,v2);
+	  push_clause(f,clause);
+	  free_clause(&clause);
+	}
+
+	v.l= l*sqrt;
+	v.c= c*sqrt;
+	for(i = 1; i <= sqrt-1;i++){
+	  v.l = l*sqrt + i;
+	  v.id = coord_to_number(v.l,v.c,v.n,s.taille);
+	  push_var(&clause,v);
+	  push_var(&clause,v2);
+	  push_clause(f,clause);
+	  free_clause(&clause);
+	}
+
+	v.l= l*sqrt;
+	v.c= c*sqrt;
+	for(i=1; i <= sqrt-1; i++){
+	  v.l = l*sqrt+i;
+	  for(j=1; j <= sqrt-1; j++){
+	    v.c = c*sqrt+j;
+	    v.id = coord_to_number(v.l,v.c,v.n,s.taille);
+	    push_var(&clause,v);
+	    push_var(&clause,v2);
+	    push_clause(f,clause);
+	    free_clause(&clause);
+	  }
+	}
+      }
+    }
   }
 
+
   /* A ce point ci je me demande quel est le pourcentage de code que j'aurais du vous laisser faire*/
-  
+
+  v.neg = false;
   //Fifth part  : Gen sudoku corresponding clauses
   for (l=0; l < s.taille; l++){
     v.l = l;
@@ -260,7 +260,7 @@ static void read_sudoku(char *filename, Formule **f){
       }
     }
   }
-  //to_3sat(f );
+  to_3sat(f );
   /* Et maintenant je me dis que c'est enfin fini pour cette fonction sauf que j'y ai fait aucun test, zero, nada
      et qu'elle ne compile surement pas*/
   /* Et la maintenant que j'ai fait une simili-optimisation du code je me met à me dire que ça va tout péter*/
