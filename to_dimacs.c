@@ -106,8 +106,8 @@ static void read_sudoku(char *filename, Formule **f){
   int sqrt;
   readsudokufile(df,&s);
   sqrt = is_perfect_square(s.taille);
-  //First part : Gen constraint 1 (Domain)
-  v.neg = false;
+  //Gen constraint 1 (Domain)
+  v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0};
   //Forall l
   for (l=0; l < s.taille; l++){
     v.l = l;
@@ -126,68 +126,11 @@ static void read_sudoku(char *filename, Formule **f){
     }
   }
 
-  //Second part : Gen constraint 2 (Line unicity)
-  for(l=0; l < s.taille; l++){
-    v.l=l;
-    for(c=0; c < s.taille; c++){
-      v.c = c;
-      for(n=1; n <= s.taille; n++){
-	//First var x[l,c,n]
-	v.n=n;
-	v.neg = true;
-	v.id = coord_to_number(v.l,v.c,v.n, s.taille);
-	push_var(&clause,v);
-	//Or loops for each column(imply)
-	for(i=0; i <= c-1; i++){
-	  v2 = (Variable){.l = v.l, .c = i, .n = v.n, .neg = true};
-	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
-	  push_var(&clause,v2);
-	}
-	for(i=c+1; i < s.taille; i++){
-	  v2 = (Variable){.l = v.l, .c = i, .n = v.n, .neg = true};
-	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
-	  push_var(&clause,v2);
-	}
-	push_clause(f,clause);
-	free_clause(&clause);
-	clause = NULL;
-      }
-    }
-  }
-
-  //Third part  : Gen constraint 3 (Column unicity)
-  
-  for(l=0; l< s.taille; l++){
-    v.l=l;
-    for(c=0; c < s.taille; c++){
-      v.c = c;
-      for(n=1; n <= s.taille; n++){
-	//First var x[l,c,n]
-	v.n=n;
-	v.neg = true;
-	v.id = coord_to_number(v.l,v.c,v.n, s.taille);
-	push_var(&clause,v);
-	//Or loops for each line(imply)
-	for(i=0; i <= l-1; i++){
-	  v2 = (Variable){.l = i, .c = v.c, .n = v.n, .neg = true};
-	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
-	  push_var(&clause,v2);
-	}
-	for(i=l+1; i < s.taille; i++){
-	  v2 = (Variable){.l = i, .c = v.c, .n = v.n, .neg = true};
-	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
-	  push_var(&clause,v2);
-	}
-	push_clause(f,clause);
-	free_clause(&clause);
-	clause = NULL;
-      }
-    }
-  }
-  //Fourth part : Gen constraint 4 (Square unicity)
+  //Gen constraint 4 (Square unicity)
 
   /* A ce point du code je me pose des questions sur à peu près tout, peut être faut-il mieux partir élever des
      chèvres dans le vercors qui sait ? */
+  v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0};
   v.neg = v2.neg = true;
   for (l = 0; l <= sqrt-1;l++){
     v2.l = l*sqrt;
@@ -233,6 +176,67 @@ static void read_sudoku(char *filename, Formule **f){
 	    push_clause(f,clause);
 	    free_clause(&clause);
 	  }
+	}
+      }
+    }
+  
+
+    //Gen constraint 2 (Line unicity)
+    v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0};
+    for(l=0; l < s.taille; l++){
+      v.l=l;
+      for(c=0; c < s.taille; c++){
+	v.c = c;
+	for(n=1; n <= s.taille; n++){
+	  //First var x[l,c,n]
+	  v.n=n;
+	  v.neg = true;
+	  v.id = coord_to_number(v.l,v.c,v.n, s.taille);
+	  push_var(&clause,v);
+	  //Or loops for each column(imply)
+	  for(i=0; i <= c-1; i++){
+	    v2 = (Variable){.l = v.l, .c = i, .n = v.n, .neg = true};
+	    v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
+	    push_var(&clause,v2);
+	  }
+	  for(i=c+1; i < s.taille; i++){
+	    v2 = (Variable){.l = v.l, .c = i, .n = v.n, .neg = true};
+	    v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
+	    push_var(&clause,v2);
+	  }
+	  push_clause(f,clause);
+	  free_clause(&clause);
+	  clause = NULL;
+	}
+      }
+    }
+
+    //Gen constraint 3 (Column unicity)
+    v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0};
+    for(l=0; l< s.taille; l++){
+      v.l=l;
+      for(c=0; c < s.taille; c++){
+	v.c = c;
+	for(n=1; n <= s.taille; n++){
+	  //First var x[l,c,n]
+	  v.n=n;
+	  v.neg = true;
+	  v.id = coord_to_number(v.l,v.c,v.n, s.taille);
+	  push_var(&clause,v);
+	  //Or loops for each line(imply)
+	  for(i=0; i <= l-1; i++){
+	    v2 = (Variable){.l = i, .c = v.c, .n = v.n, .neg = true};
+	    v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
+	    push_var(&clause,v2);
+	  }
+	  for(i=l+1; i < s.taille; i++){
+	    v2 = (Variable){.l = i, .c = v.c, .n = v.n, .neg = true};
+	    v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
+	    push_var(&clause,v2);
+	  }
+	  push_clause(f,clause);
+	  free_clause(&clause);
+	  clause = NULL;
 	}
       }
     }
