@@ -290,7 +290,7 @@ static void read_sudoku(char *filename, Formule **f){
     }
   }
   //Transfo en 3sat
-  //to_3sat(f );
+  to_3sat(f );
   /* Et maintenant je me dis que c'est enfin fini pour cette fonction sauf que j'y ai fait aucun test, zero, nada
      et qu'elle ne compile surement pas*/
   /* Et la maintenant que j'ai fait une simili-optimisation du code je me met à me dire que ça va tout péter*/

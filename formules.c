@@ -109,8 +109,8 @@ void to_3sat(Formule **f){
       initv(b,Nb); //z2 et -z2
       /* On ajoute à f les nouvelles clauses */
       // Modification de la clause originale y1 -> -z1 y1 -z2
-      push_var(&iter->c->next, a);
-      push_var(&iter->c->next, b);
+      push_var(&iter->c->next, Na);
+      push_var(&iter->c->next, Nb);
       // Ajout de la clause  z1 y1 z2
       push_var(&x,a);
       push_var(&x,iter->c->v);
