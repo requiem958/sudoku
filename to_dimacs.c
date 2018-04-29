@@ -230,8 +230,6 @@ static void read_sudoku(char *filename, Formule **f){
   //Gen constraint 4 (Square unicity)
 
   puts("Step 4 !!!!");
-  /* A ce point du code je me pose des questions sur à peu près tout, peut être faut-il mieux partir élever des
-     chèvres dans le vercors qui sait ? */
   v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0,.neg=false};
   v.neg = v2.neg = true;
   for (l = 0; l <= sqrt-1;l++){
@@ -282,9 +280,6 @@ static void read_sudoku(char *filename, Formule **f){
     }
   }
 
-
-  /* A ce point ci je me demande quel est le pourcentage de code que j'aurais du vous laisser faire*/
-
   puts("Step 6666666");
   v.neg = false;
   //Fifth part  : Gen sudoku corresponding clauses
@@ -306,9 +301,6 @@ static void read_sudoku(char *filename, Formule **f){
   //Transfo en 3sat
   puts("Final gen step -> To 3 sat");
   to_3sat(f );
-  /* Et maintenant je me dis que c'est enfin fini pour cette fonction sauf que j'y ai fait aucun test, zero, nada
-     et qu'elle ne compile surement pas*/
-  /* Et la maintenant que j'ai fait une simili-optimisation du code je me met à me dire que ça va tout péter*/
 }
 
 
