@@ -6,7 +6,7 @@
 #include "to_dimacs.h"
 
 //Convertit le fichier dimacs en sudoku
- static sudoku* read_dimacs(char *filename,unsigned  int sudoku_size);
+ static void read_dimacs(char *filename,unsigned  int sudoku_size, sudoku *a);
 
 //Ecrit le fichier dimacs correspondant à la Formule f
 static void write_dimacs(char *filename, Formule *f);
@@ -38,8 +38,9 @@ int number_to_coord(unsigned int number, unsigned int *l, unsigned int *c, unsig
 }
 
 void dimacs_to_sudoku(char *dimacs_file, char *sudoku_file,unsigned int sudoku_size){
-  sudoku *a;
-  a=read_dimacs(dimacs_file,sudoku_size);
+ 	sudoku *a= (sudoku* )malloc(sizeof(sudoku));
+	puts("1");
+  read_dimacs(dimacs_file,sudoku_size,a);puts("2");
   write_sudoku(sudoku_file,a);
 }
 
@@ -53,22 +54,25 @@ void sudoku_to_dimacs(char *dimacs_file, char *sudoku_file){
 /* Fonctions locales */
 
 //Convertit le fichier dimacs en tableau sudoku
- static sudoku* read_dimacs(char *filename,unsigned  int sudoku_size){
-	sudoku *a=(sudoku*) malloc(sizeof(sudoku));
+ static void read_dimacs(char *filename,unsigned  int sudoku_size, sudoku *a){
 	unsigned int id,l,n,c;
 	char Sat;
 	a->taille = sudoku_size;
   FILE *df = fopen(filename,"r");
   if (df == NULL)
-    return a;
+    return;
  fscanf(df," %c",&Sat);
+ printf("%c",Sat);
  fscanf(df," %c",&Sat);
+  printf("%c",Sat);
  fscanf(df," %c",&Sat);
- while (feof(df)){
-	 fscanf(df," %d",&id);
+  printf("%c",Sat);
+ fscanf(df," %d",&id);
+ while (!feof(df)){
 	 if ( id > 0 && id < MAX*MAX*MAX){
 		number_to_coord(id,&l,&c,&n,a->taille);
 	a->grille[l][c]=n;
+	fscanf(df," %d",&id);
 	 }
  }
 }
