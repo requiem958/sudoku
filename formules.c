@@ -100,7 +100,7 @@ void to_3sat(Formule **f){
   Clause *x=NULL,*w=NULL;
   Variable a,Na;
   Variable b,Nb;
-  ind=MAX*MAX*MAX+1;
+  ind=coord_to_number(MAX+1,MAX+1,MAX+1,0);
   for (iter = *f; iter != NULL; iter= iter->next){
     switch(ln =length(iter->c)){
     case 1:

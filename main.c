@@ -89,32 +89,27 @@ int main(void){
   return 0;
 #endif
 #ifdef TEST_NUMBCOORD
-#define SUDOKU_SIZE 9
-  int l=0,c=0,n=1;
+#define SUDOKU_SIZE 4
+  unsigned int l=0,c=1,n=2;
   int number=0;
 
-  //Test pour le sudoku à 1 case
-  number = coord_to_number(l,c,n,1);
+  //Test pour le sudoku � 4 case
+  number = coord_to_number(l,c,n,SUDOKU_SIZE);
   printf("(%d,%d,%d) -> %d\n",l,c,n,number);
   l = c = n = 0;
-  number_to_coord(number,&l,&c,&n,1);
+  number_to_coord(number,&l,&c,&n,SUDOKU_SIZE);
   printf("(%d,%d,%d) <- %d\n",l,c,n,number);
 
   printf("Sudoku à %d cases, %d valeurs par cases", SUDOKU_SIZE, SUDOKU_SIZE);
   //Test total du sudoku à 4 cases
   for (l=0; l < SUDOKU_SIZE; l++){
-    printf("Ligne %d\n",l);
     for (c=0; c < SUDOKU_SIZE; c++){
-      printf("\tColonne %d\n",c);
       for (n=1; n <= SUDOKU_SIZE; n++){
 	number = coord_to_number(l,c,n,SUDOKU_SIZE);
-	printf("\t\tValeur %d\n",n);
-	printf("\t\t\tLe tout codé par : %d\n",number);
+	printf("[l:%d,c:%d,n:%d] -> %d\n",l,c,n,number);
       }
     }
   }
-  if (number != SUDOKU_SIZE*SUDOKU_SIZE*SUDOKU_SIZE-1)
-    puts("Il manque des valeurs");
   
   return 0;
 #endif
@@ -125,11 +120,7 @@ int main(void){
   Formule * f4 = NULL;
 
   /* Test new_formule : retourne une formule vide */
-<<<<<<< HEAD
   /* Cas : initialisà*/
-=======
-  /* Cas : initialis� */
->>>>>>> master
   Formule f1 = new_formule();
 
   /* Cas : initialisé avec NULL */
@@ -227,9 +218,7 @@ int main(void){
 
   /* Test readsudokufile, affichergrille et writesudokufile */
   sudoku P;
-
-	 dimacs_to_sudoku("sudoku.txt","sudoku1.txt",9);
-	   FILE * file1 = fopen("sudoku.txt","r");
+  FILE * file1 = fopen("sudoku.txt","r");
   FILE * file2 = fopen("sudoku1.txt","w");
   readsudokufile(file1,&P);
   affichergrille(&P);
@@ -241,6 +230,8 @@ int main(void){
   /* Test sudoku_to_dimacs */
   printf("Test final\n");
   sudoku_to_dimacs("dim.txt","sudoku.txt");
+  system("./minisat dim.txt dim_sat.txt");
+  dimacs_to_sudoku("dim_sat.txt","sudoku_sol.txt",4);
   return 0;
 #endif
 }

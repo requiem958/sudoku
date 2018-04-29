@@ -6,7 +6,7 @@
 #include "to_dimacs.h"
 
 //Convertit le fichier dimacs en sudoku
- static void read_dimacs(char *filename,unsigned  int sudoku_size, sudoku *a);
+static void read_dimacs(char *filename,unsigned  int sudoku_size, sudoku *a);
 
 //Ecrit le fichier dimacs correspondant à la Formule f
 static void write_dimacs(char *filename, Formule *f);
@@ -21,27 +21,26 @@ static void write_sudoku(char *filename,sudoku *a);
 unsigned int coord_to_number(unsigned int l, unsigned int c, unsigned int n, unsigned int sudoku_size){
   //Le sudoku size +1 permet d'eviter des doublets non liants
   //Les indices commencent à 1
-  return n + c*(sudoku_size+1) + l*(sudoku_size+1)*(sudoku_size+1);
+  return n + c*(MAX+1) + l*(MAX+1)*(MAX+1);
 }
 
 //Convertit un nombre en (l,c,n) selon la taille du sudoku;
 int number_to_coord(unsigned int number, unsigned int *l, unsigned int *c, unsigned int *n, unsigned int sudoku_size){
-  *n = 1 + number % (sudoku_size+1);
-  number -= (*n)-1;
+  *n = number % (MAX+1);
+  number -= *n;
 
-  *c = (number % ((sudoku_size+1)*(sudoku_size+1)))/(sudoku_size+1);
-  number -= (*c)*(sudoku_size+1);
+  *c = (number % ((MAX+1)*(MAX+1)))/(MAX+1);
+  number -= (*c)*(MAX+1);
 
-  *l = number/((sudoku_size+1)*(sudoku_size+1));
+  *l = number/((MAX+1)*(MAX+1));
 
-  return (*n) + (*c)*(sudoku_size+1) + (*l)*(sudoku_size+1)*(sudoku_size+1);
+  return (*n) + (*c)*(MAX+1) + (*l)*(MAX+1)*(MAX+1);
 }
 
 void dimacs_to_sudoku(char *dimacs_file, char *sudoku_file,unsigned int sudoku_size){
- 	sudoku *a= (sudoku* )malloc(sizeof(sudoku));
-	puts("1");
-  read_dimacs(dimacs_file,sudoku_size,a);puts("2");
-  write_sudoku(sudoku_file,a);
+  sudoku a;
+  read_dimacs(dimacs_file,sudoku_size,&a);
+  write_sudoku(sudoku_file,&a);
 }
 
 void sudoku_to_dimacs(char *dimacs_file, char *sudoku_file){
@@ -54,27 +53,29 @@ void sudoku_to_dimacs(char *dimacs_file, char *sudoku_file){
 /* Fonctions locales */
 
 //Convertit le fichier dimacs en tableau sudoku
- static void read_dimacs(char *filename,unsigned  int sudoku_size, sudoku *a){
-	unsigned int id,l,n,c;
-	char Sat;
-	a->taille = sudoku_size;
+static void read_dimacs(char *filename,unsigned  int sudoku_size, sudoku *a){
+  int id;
+  unsigned int l,n,c;
+  char Sat;
+  a->taille = sudoku_size;
   FILE *df = fopen(filename,"r");
   if (df == NULL)
     return;
- fscanf(df," %c",&Sat);
- printf("%c",Sat);
- fscanf(df," %c",&Sat);
+  fscanf(df," %c",&Sat);
   printf("%c",Sat);
- fscanf(df," %c",&Sat);
+  fscanf(df," %c",&Sat);
   printf("%c",Sat);
- fscanf(df," %d",&id);
- while (!feof(df)){
-	 if ( id > 0 && id < MAX*MAX*MAX){
-		number_to_coord(id,&l,&c,&n,a->taille);
-	a->grille[l][c]=n;
-	fscanf(df," %d",&id);
-	 }
- }
+  fscanf(df," %c",&Sat);
+  printf("%c",Sat);
+  do{
+    fscanf(df," %d",&id);
+    if ( id > 0 && (unsigned ) id < coord_to_number(sudoku_size-1,sudoku_size-1,sudoku_size,0)){
+      printf("ID OK : %d\n",id);
+      if (number_to_coord((unsigned int) id,&l,&c,&n,a->taille) != id)
+	puts("Probleme avec cet id");
+      a->grille[l][c]=n;
+    }
+  }while (!feof(df));
 }
 //Ecrit le fichier dimacs correspondant à la formule f (préalablement convertie en 3-sat)
 static void write_dimacs(char *filename, Formule *f){
@@ -253,7 +254,7 @@ static void read_sudoku(char *filename, Formule **f){
       }
     }
   }
-  to_3sat(f );
+  //to_3sat(f );
   /* Et maintenant je me dis que c'est enfin fini pour cette fonction sauf que j'y ai fait aucun test, zero, nada
      et qu'elle ne compile surement pas*/
   /* Et la maintenant que j'ai fait une simili-optimisation du code je me met à me dire que ça va tout péter*/
@@ -263,7 +264,7 @@ static void read_sudoku(char *filename, Formule **f){
 //Ecrit le fichier sudoku correspondant aux sudoku dans un fichier
 static void write_sudoku(char *filename,sudoku *a){
   FILE *df = fopen(filename,"w");
- int i,j;
+  int i,j;
   fprintf(df,"taille : %d * %d \n",a->taille,a->taille);  //affichage taille
   for (i=0;i<a->taille;i++){
     for(j=0;j<a->taille;j++){
@@ -271,7 +272,7 @@ static void write_sudoku(char *filename,sudoku *a){
     }
     fprintf(df,"\n");
     for(j=0;j<a->taille;j++){
-      fprintf(df,"---"); // presentation
+      fprintf(df,"-----"); // presentation
     }
     fprintf (df,"\n");
   }
