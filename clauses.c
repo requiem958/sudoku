@@ -158,6 +158,8 @@ bool equal_clause(Clause *c1, Clause *c2){
     return true;
   else if ((!c1 && c2) || (c1 && !c2))
     return false;
+  else if (length(c1) != length(c2))
+    return false;
   else
     return equalcl(c1,c2);
 }

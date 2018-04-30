@@ -87,9 +87,9 @@ void print_formule(const Formule *f){
 static Variable init_fvar (unsigned int ind){
   Variable a;
   a.id = ind ;
-  a.n=-1;
-  a.l=-1;
-  a.c=-1;
+  a.n=MAX+1;
+  a.l=MAX;
+  a.c=MAX;
   a.neg=false;
   return a;
 }
@@ -106,8 +106,7 @@ void to_3sat(Formule **f){
   for (iter = *f; iter != NULL; iter= iter->next){
     switch(ln =length(iter->c)){
     case 1:
-      //puts("1");
-      print_clause(iter->c);
+      puts("1");
       /* Creation des variables fraiches */
       initv(a,Na); //z1 et -z1
       initv(b,Nb); //z2 et -z2
@@ -135,8 +134,7 @@ void to_3sat(Formule **f){
       push_var(&x,Nb);
       break;
     case 2:
-      //puts("2");
-      print_clause(iter->c);
+      puts("2");
       initv(a,Na);
       // Modification de la clause originale y1 y2 -> y1 y2 z1
       push_var(&iter->c,a);
@@ -146,15 +144,13 @@ void to_3sat(Formule **f){
       push_var(&x,Na);
       break;
     case 3:
-      //puts("3");
-      print_clause(iter->c);
+      puts("3");
       break;
     case 0:
-      //puts("Void clause");
+      puts("Void clause");
       break;
     default:
-      //puts(">3");
-      print_clause(iter->c);
+      puts(">3");
       //Clause originale y1 y2 y3 ... yn
       //On sauvegarde y3 ... yn
       w = iter->c->next->next;
@@ -182,10 +178,14 @@ void to_3sat(Formule **f){
       push_var(&x,Na);
       push_var(&x,w->v);
       push_var(&x,w->next->v);
+      break;
     }
-    push_clause(f,x);
+    if (ln != 0 && ln != 3)
+      push_clause(f,x);
     if (x != NULL)
       free_clause(&x);
+    if (w != NULL)
+      free_clause(&w);
     assert(x == NULL);
   }
   //Au fait l'algo est : http://inf242.forge.imag.fr/SAT-3SAT-and-other-red.pdf

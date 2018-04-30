@@ -149,7 +149,7 @@ int main(void){
   /* Résultat attendu : 0 */
   printf("%i\n",is_empty_formule(&f3));
 
-  for(v.id = 0; v.id < 4; v.id++)
+  for(v.id = 0; v.id < 5; v.id++)
     push_var(&c,v);
 
   /* Test count_var_in_formule : retourne un entier */
@@ -158,8 +158,14 @@ int main(void){
   /* Test count_clauses_in_formule : retourne un entier */
   /* Résultat attendu : 1 */ 
   push_clause(&f4,c);
+  v.id = 72;
+  push_var(&c,v);
+  push_clause(&f4,c);
   printf("nombre de var = %i\n",count_var_in_formule(f4));
   printf("nombre de clauses = %i\n\n",count_clauses_in_formule(f4));
+  print_formule(f4);
+  to_3sat(&f4);
+  print_formule(f4);
   free_clause(&c);
 
   /* Test new_clause : retourne une clause vide */

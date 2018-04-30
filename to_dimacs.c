@@ -306,8 +306,7 @@ static void read_sudoku(char *filename, Formule **f){
     }
   }
   //Transfo en 3sat
-  puts("Final gen step -> To 3 sat");
-  //to_3sat(f );
+  to_3sat(f );
 }
 
 

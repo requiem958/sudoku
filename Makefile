@@ -1,9 +1,9 @@
-OPT=-Wall -Wextra -O3
+OPT=-Wall -Wextra
 CC=gcc $(OPT)
 DEBUG=-g
 
 
-all:main
+all: Makefile main
 
 to_dimacs.o: to_dimacs.c to_dimacs.h formules.h
 	$(CC) $(DEBUG) -c $<
