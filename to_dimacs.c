@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "liresudoku.h"
 #include "formules.h"
@@ -18,7 +19,7 @@ static void read_sudoku(char *filename, Formule **f);
 static void write_sudoku(char *filename,sudoku *a);
 
 //Convertit une coordonÃ©e (l,c,n) en un nombre entier
-unsigned int coord_to_number(unsigned int l, unsigned int c, unsigned int n, unsigned int sudoku_size){
+unsigned int coord_to_number(unsigned int l, unsigned int c, unsigned int n){
   //Le sudoku size +1 permet d'eviter des doublets non liants
   //Les indices commencent à 1
   return n + c*(MAX+1) + l*(MAX+1)*(MAX+1);
@@ -26,7 +27,7 @@ unsigned int coord_to_number(unsigned int l, unsigned int c, unsigned int n, uns
 
 //Convertit un nombre en (l,c,n)
 //Les pointeurs sont des références
-int number_to_coord(unsigned int number, unsigned int *l, unsigned int *c, unsigned int *n, unsigned int sudoku_size){
+int number_to_coord(unsigned int number, unsigned int *l, unsigned int *c, unsigned int *n){
 
   //On affecte à n la valeur qui suit
   *n = number % (MAX+1);
@@ -62,29 +63,28 @@ void sudoku_to_dimacs(char *dimacs_file, char *sudoku_file){
 static void read_dimacs(char *filename,unsigned  int sudoku_size, sudoku *a){
   int id;
   unsigned int l,n,c;
-  char Sat;
+  char sat[4];
+  const unsigned int high_value = coord_to_number(sudoku_size-1,sudoku_size-1,sudoku_size) + 1;
   FILE *df = fopen(filename,"r");
   a->taille = sudoku_size;
   if (df == NULL)
     return;
   //Lecture de l'entete et affichage
-  fscanf(df," %c",&Sat);
-  printf("%c",Sat);
-  fscanf(df," %c",&Sat);
-  printf("%c",Sat);
-  fscanf(df," %c",&Sat);
-  printf("%c",Sat);
+  fgets(sat,3,df);
+  if (!(sat[0] == 'S' && sat[1] == 'A' && sat[2] == 'T')){
+    puts("unsastifiable dimacs file, no sudoku");
+    fclose(df);
+    return;
+  }
 
   //Lecture des variables
   do{
     fscanf(df," %d",&id);
     //Si id est positif => on a une valeur à donner à la case
     //Si id > coord_machin => C'est une fausse valeur générée par le to_3sat donc on la saute
-    if ( id > 0 && (unsigned ) id < coord_to_number(sudoku_size-1,sudoku_size-1,sudoku_size,0)){
+    if ( id > 0 && (unsigned ) id < high_value){
       printf("ID OK : %d\n",id);
-      //Test à ne pas pseudocoder
-      if (number_to_coord((unsigned int) id,&l,&c,&n,a->taille) != id)
-	puts("Probleme avec cet id");
+      number_to_coord((unsigned) id, &l,&c,&n);
       //On affecte la bonne valeur à la case dans le sudoku
       a->grille[l][c]=n;
     }
@@ -95,7 +95,7 @@ static void read_dimacs(char *filename,unsigned  int sudoku_size, sudoku *a){
 //Ecrit le fichier dimacs correspondant à la formule f (préalablement convertie en 3-sat)
 static void write_dimacs(char *filename, Formule *f){
   FILE *df = fopen(filename,"w");
-  Clause *c;
+  Clause *c = NULL;
   //Entete du fichier dimacs
   fprintf(df,"p cnf %d %d\n", count_var_in_formule(f), count_clauses_in_formule(f));
   //corps du fichier dimacs
@@ -124,14 +124,16 @@ static void read_sudoku(char *filename, Formule **f){
   int l,c,n;
   int i,j;
   int sqrt;
+  assert(f != NULL);
   //On récupére dans s toutes les valeurs du fichier sudoku
   readsudokufile(df,&s);
   fclose(df);
   //sqrt <- racine(s.taille) si s.taille est un carré, sinon -1
   sqrt = is_perfect_square(s.taille);
-  //SI on choppe un -1 c'est quey'a un bleme on se casse
+  //SI on choppe un -1 c'est que on a un bleme on se casse
   if (sqrt < 0)
     return;
+  
   //Generation de la constraint 1 (Domaine)
   //On affecte à v et v2 les valeurs par défaut nul (Tout à 0, et variable non neg)
   v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0, .neg = false};
@@ -143,10 +145,11 @@ static void read_sudoku(char *filename, Formule **f){
     for (c=0; c < s.taille; c++){
       v.c = c;
       //Exists n
+      assert(clause == NULL);
       for (n = 1; n <= s.taille; n++){
 	//On crée la variable x[l,c,n]
 	v.n = n;
-	v.id = coord_to_number(v.l,v.c,v.n, s.taille);
+	v.id = coord_to_number(v.l,v.c,v.n);
 	//On l'ajoute à la clause courzante (si vide elle est créée)
 	push_var(&clause,v);
       }
@@ -154,36 +157,37 @@ static void read_sudoku(char *filename, Formule **f){
       push_clause(f,clause);
       //On détruit la clausse
       free_clause(&clause);
+     
     }
   }
   //Gen constraint 2 (Line unicity)
   puts("Step 2");
   v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0};
   for(l=0; l < s.taille; l++){
-    printf("Compute row : %d\n",l);
     v.l=l;
     for(c=0; c < s.taille; c++){
-      printf("Compute col : %d\n",c);
       v.c = c;
       for(n=1; n <= s.taille; n++){
 	//First var x[l,c,n]
 	v.n=n;
 	v.neg = true;
-	v.id = coord_to_number(v.l,v.c,v.n, s.taille);
+	v.id = coord_to_number(v.l,v.c,v.n);
+	assert(clause == NULL);
 	//Or loops for each column
 	for(i=0; i <= c-1; i++){
 	  push_var(&clause,v);
 	  v2 = (Variable){.l = v.l, .c = i, .n = v.n, .neg = true};
-	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
+	  v2.id = coord_to_number(v2.l,v2.c, v2.n);
 	  push_var(&clause,v2);
 	  push_clause(f,clause);
 	  free_clause(&clause);
 	    
 	}
+	assert(clause == NULL);
 	for(i=c+1; i < s.taille; i++){
 	  push_var(&clause,v);
 	  v2 = (Variable){.l = v.l, .c = i, .n = v.n, .neg = true};
-	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
+	  v2.id = coord_to_number(v2.l,v2.c, v2.n);
 	  push_var(&clause,v2);
 	  push_clause(f,clause);
 	  free_clause(&clause);
@@ -197,20 +201,19 @@ static void read_sudoku(char *filename, Formule **f){
   v = v2 = (Variable){.id = 0,.l = 0,.c = 0,.n = 0};
   v.neg = true;
   for(l=0; l< s.taille; l++){
-    printf("Row : %d\n",l);
     v.l=l;
     for(c=0; c < s.taille; c++){
-      printf("Col : %d\n",c);
       v.c = c;
       for(n=1; n <= s.taille; n++){
 	//First var x[l,c,n]
 	v.n=n;
-	v.id = coord_to_number(v.l,v.c,v.n, s.taille);
+	v.id = coord_to_number(v.l,v.c,v.n);
+	assert(clause == NULL);
 	//Or loops for each line(imply)
 	for(i=0; i <= l-1; i++){
 	  push_var(&clause,v);
 	  v2 = (Variable){.l = i, .c = v.c, .n = v.n, .neg = true};
-	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
+	  v2.id = coord_to_number(v2.l,v2.c, v2.n);
 	  push_var(&clause,v2);
 	  push_clause(f,clause);
 	  free_clause(&clause);
@@ -218,7 +221,7 @@ static void read_sudoku(char *filename, Formule **f){
 	for(i=l+1; i < s.taille; i++){
 	  push_var(&clause,v);
 	  v2 = (Variable){.l = i, .c = v.c, .n = v.n, .neg = true};
-	  v2.id = coord_to_number(v2.l,v2.c, v2.n, s.taille);
+	  v2.id = coord_to_number(v2.l,v2.c, v2.n);
 	  push_var(&clause,v2);
 	  push_clause(f,clause);
 	  free_clause(&clause);
@@ -240,12 +243,13 @@ static void read_sudoku(char *filename, Formule **f){
       v.c= c*sqrt;
       for (n = 1 ; n <= s.taille; n++){
 	v2.n = n;
-	v2.id = coord_to_number(v2.l,v2.c,v2.n,s.taille);
+	v2.id = coord_to_number(v2.l,v2.c,v2.n);
 	// Var temp
 	v.n= n;
+	 assert(clause == NULL);
 	for(i = 1; i <= sqrt-1;i++){
 	  v.c =c*sqrt+ i;
-	  v.id = coord_to_number(v.l,v.c,v.n,s.taille);
+	  v.id = coord_to_number(v.l,v.c,v.n);
 	  push_var(&clause,v);
 	  push_var(&clause,v2);
 	  push_clause(f,clause);
@@ -254,9 +258,10 @@ static void read_sudoku(char *filename, Formule **f){
 
 	v.l= l*sqrt;
 	v.c= c*sqrt;
+	 assert(clause == NULL);
 	for(i = 1; i <= sqrt-1;i++){
 	  v.l = l*sqrt + i;
-	  v.id = coord_to_number(v.l,v.c,v.n,s.taille);
+	  v.id = coord_to_number(v.l,v.c,v.n);
 	  push_var(&clause,v);
 	  push_var(&clause,v2);
 	  push_clause(f,clause);
@@ -265,11 +270,12 @@ static void read_sudoku(char *filename, Formule **f){
 
 	v.l= l*sqrt;
 	v.c= c*sqrt;
+	 assert(clause == NULL);
 	for(i=1; i <= sqrt-1; i++){
 	  v.l = l*sqrt+i;
 	  for(j=1; j <= sqrt-1; j++){
 	    v.c = c*sqrt+j;
-	    v.id = coord_to_number(v.l,v.c,v.n,s.taille);
+	    v.id = coord_to_number(v.l,v.c,v.n);
 	    push_var(&clause,v);
 	    push_var(&clause,v2);
 	    push_clause(f,clause);
@@ -279,8 +285,7 @@ static void read_sudoku(char *filename, Formule **f){
       }
     }
   }
-
-  puts("Step 6666666");
+  puts("Step 5");
   v.neg = false;
   //Fifth part  : Gen sudoku corresponding clauses
   for (l=0; l < s.taille; l++){
@@ -290,7 +295,8 @@ static void read_sudoku(char *filename, Formule **f){
       //Si on a une case remplie
       if (s.grille[l][c] != 0){
 	v.n = s.grille[l][c];
-	v.id = coord_to_number(v.l,v.c,v.n,s.taille);
+	v.id = coord_to_number(v.l,v.c,v.n);
+	assert(clause == NULL);
 	//La mettre en clause
 	push_var(&clause,v);
 	push_clause(f,clause);
@@ -308,6 +314,7 @@ static void read_sudoku(char *filename, Formule **f){
 static void write_sudoku(char *filename,sudoku *a){
   FILE *df = fopen(filename,"w");
   int i,j;
+  assert(a != NULL);
   fprintf(df,"taille : %d * %d \n",a->taille,a->taille);  //affichage taille
   for (i=0;i<a->taille;i++){
     for(j=0;j<a->taille;j++){

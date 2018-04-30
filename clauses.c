@@ -22,14 +22,15 @@ Clause* clause_copy(Clause* src){
   return dest;
 }
 
+static int rec_length(Clause *c, int acc){
+  if (c==NULL)
+    return acc;
+  else
+    return rec_length(c->next,acc+1);
+}
+
 // tail-rec fun, with nested functions (not allowed with pedantic)
 int length(Clause *c){
-  int rec_length(Clause *c, int acc){
-    if (c==NULL)
-      return acc;
-    else
-      return rec_length(c->next,acc+1);
-  }
   return rec_length(c,0);
 }
 

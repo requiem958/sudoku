@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <assert.h>
 #include "to_dimacs.h"
 #include "liresudoku.h"
 #include "formules.h"
@@ -42,7 +43,7 @@ int count_clauses_in_formule(const Formule *f){
 int push_clause(Formule **f,Clause *c){
   if (*f == NULL){
     *f = malloc(sizeof(Formule));
-    if(f == NULL){
+    if(!*f){
       puts("Impossible d'allouer la formule");
       return -1;
     }
@@ -101,10 +102,13 @@ void to_3sat(Formule **f){
   Clause *x=NULL,*w=NULL;
   Variable a,Na;
   Variable b,Nb;
-  ind=coord_to_number(MAX+1,MAX+1,MAX+1,0);
+  ind=coord_to_number(MAX+1,MAX+1,MAX+1);
   for (iter = *f; iter != NULL; iter= iter->next){
+    assert(iter->c != NULL);
     switch(ln =length(iter->c)){
     case 1:
+            puts(">3");
+      print_clause(iter->c);
       /* Creation des variables fraiches */
       initv(a,Na); //z1 et -z1
       initv(b,Nb); //z2 et -z2
@@ -118,19 +122,22 @@ void to_3sat(Formule **f){
       push_var(&x,b);
       push_clause(f,x);
       free_clause(&x);
+      assert(x==NULL);
       // Ajout de la clause -z1 y1 z2
       push_var(&x,Na);
       push_var(&x,iter->c->v);
       push_var(&x,b);
       push_clause(f,x);
       free_clause(&x);
+      assert(x==NULL);
       // Ajout de la clause  z1 y1 -z2
       push_var(&x,a);
       push_var(&x,iter->c->v);
       push_var(&x,Nb);
-      push_clause(f,x);
       break;
     case 2:
+            puts(">3");
+      print_clause(iter->c);
       initv(a,Na);
       // Modification de la clause originale y1 y2 -> y1 y2 z1
       push_var(&iter->c,a);
@@ -138,11 +145,14 @@ void to_3sat(Formule **f){
       push_var(&x,iter->c->v);
       push_var(&x,iter->c->next->v);
       push_var(&x,Na);
-      push_clause(f,x);
       break;
     case 3:
+            puts(">3");
+      print_clause(iter->c);
       break;
     default:
+      puts(">3");
+      print_clause(iter->c);
       //Clause originale y1 y2 y3 ... yn
       //On sauvegarde y3 ... yn
       w = iter->c->next->next;
@@ -152,6 +162,7 @@ void to_3sat(Formule **f){
       initv(a,Na);
       push_var(&iter->c,a);
       for (i=4;i<ln;i++){// -z(i-3) y(i-1) z(i-2)
+	assert(w != NULL);
 	initv(b,Nb);
 	push_var(&x,Na); //-z(i-3)
 	push_var(&x,w->v); //yi-1
@@ -169,10 +180,11 @@ void to_3sat(Formule **f){
       push_var(&x,Na);
       push_var(&x,w->v);
       push_var(&x,w->next->v);
-      push_clause(f,x);
     }
+    push_clause(f,x);
     if (x != NULL)
       free_clause(&x);
+    assert(x == NULL);
   }
   //Au fait l'algo est : http://inf242.forge.imag.fr/SAT-3SAT-and-other-red.pdf
 }
