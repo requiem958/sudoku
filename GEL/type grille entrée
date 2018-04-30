@@ -1,0 +1,16 @@
+2    -- taille d'un caré parfait
+2 | 0 
+-----
+0 | 1
+
+rendu aprés fonction readsodukofile()
+tableau à longueur explicite
+
+type soduko 
+int taille
+int soduko [MAX][MAX]
+
+soduko [0][0] =2
+soduko [0][1] =0
+soduko [1][0] =0
+soduko [1][1] =1

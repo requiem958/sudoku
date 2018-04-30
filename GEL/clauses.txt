@@ -1,0 +1,53 @@
+On a N^3 variables x(l,c,n)
+
+Sans simplification on a les denombrements suivants :
+
+1ere contrainte : Domaine
+     ET[i=0,N-1] ( ET[c=0,N-1] ( OU[n=1,N] ) )
+    ={x[i,c,n] , i,c dans [0..N-1] et n dans [1..N] } => taille : N*N*(N-1)
+     1 clause = N-1 variable (V(n=1->N))
+     (N  )^2 clauses de taille N-1
+
+2eme contrainte : Lignes
+     ET[i=0,N-1] ( ET[i=1,N]( ET[c=0,N-1] ( OU[i=0,N-1, i != c] (2var)) ) )
+     Une clause = 2*(N-2) var
+     (N)*(N-1)*(N) clauses de taille 2*(N-2)
+
+3eme contrainte : Colonnes
+     Identiques à ligne (carrés)
+     ==>      (N)*(N-1)*(N) clauses de taille 2*(N-2)
+
+4eme contrainte : Carres
+     ET[n=1,N] (
+     	       ET[l=0,sqrt(N)-1] (
+	                 ET[c=0,sqrt(N)-1] (
+     			        ET[k'=1,sqrt(N)-1] (2 var)
+		       		ET[k=1,sqrt(N)-1]  (2 var)
+				ET[k,k'=(1,1),(sqrt(N)-1,sqrt(N)-1)] (2var)
+				)
+			)
+		)
+
+
+	=> (N-1)*(sqrt(N)-1)*(sqrt(N)-1)*(2*(sqrt(N)-1)+(sqrt(N)-1)^2) clauses de 2 var
+	=> (N-1)*(N-2*sqrt(N) + 1)*(2*sqrt(N)-2+N-2*sqrt(N)+1) clauses de 2 var
+	=> (N-1)*-----------------*(N-1) clauses de 2 var
+	=> (N-1)^2*(sqrt(N)-1)^2 clauses de deux var
+
+En tout :
+
+   (2*N^2*(N-1) + (N-1)^2*(sqrt(N)-1)^2) clauses de 2 var
+   N^2 clauses de tailles N-1
+
+   <=>
+   (4*N^2*(N-1) + 2*(N-1)^2*(sqrt(N)-1)^2 + (N-1)*N^2 var) (non distinctes mais présentes en formules)
+   (N-1)*(5*N^2 + 2*(N-1)*(sqrt(N)-1)^2 var) (non distinctes mais présentes en formules) ==> Taille de l'info a stocker
+
+pour N=1 (sudoku à une case) => Aucune information à stocker ... Normal une seule solution !!! (1)
+pour N=4 	       	     => 153 informations à stocker
+pour N=9		     => 3752
+pour N=16		     => 23250
+
+Ça me parait rester raisonnable.
+     	       
+     
