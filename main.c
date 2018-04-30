@@ -243,7 +243,7 @@ int main(void){
   printf("Test final\n");
   sudoku_to_dimacs("dim.txt","sudoku.txt");
   system("./minisat dim.txt dim_sat.txt");
-  dimacs_to_sudoku("dim_sat.txt","sudoku_sol.txt",16);
+  dimacs_to_sudoku("dim_sat.txt","sudoku_sol.txt",4);
   return 0;
 #endif
 }

@@ -70,7 +70,8 @@ static void read_dimacs(char *filename,unsigned  int sudoku_size, sudoku *a){
   if (df == NULL)
     return;
   //Lecture de l'entete et affichage
-  fgets(sat,3,df);
+  fgets(sat,4,df);
+  printf("%s\n",sat);
   if (!(sat[0] == 'S' && sat[1] == 'A' && sat[2] == 'T')){
     puts("unsastifiable dimacs file, no sudoku");
     fclose(df);
@@ -306,7 +307,7 @@ static void read_sudoku(char *filename, Formule **f){
   }
   //Transfo en 3sat
   puts("Final gen step -> To 3 sat");
-  to_3sat(f );
+  //to_3sat(f );
 }
 
 

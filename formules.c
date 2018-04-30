@@ -104,10 +104,9 @@ void to_3sat(Formule **f){
   Variable b,Nb;
   ind=coord_to_number(MAX+1,MAX+1,MAX+1);
   for (iter = *f; iter != NULL; iter= iter->next){
-    assert(iter->c != NULL);
     switch(ln =length(iter->c)){
     case 1:
-            puts(">3");
+            puts("1");
       print_clause(iter->c);
       /* Creation des variables fraiches */
       initv(a,Na); //z1 et -z1
@@ -136,7 +135,7 @@ void to_3sat(Formule **f){
       push_var(&x,Nb);
       break;
     case 2:
-            puts(">3");
+            puts("2");
       print_clause(iter->c);
       initv(a,Na);
       // Modification de la clause originale y1 y2 -> y1 y2 z1
@@ -147,8 +146,11 @@ void to_3sat(Formule **f){
       push_var(&x,Na);
       break;
     case 3:
-            puts(">3");
+            puts("3");
       print_clause(iter->c);
+      break;
+    case 0:
+      puts("Void clause");
       break;
     default:
       puts(">3");
