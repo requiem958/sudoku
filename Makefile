@@ -1,6 +1,6 @@
 OPT=-Wall -Wextra -O3
 CC=gcc $(OPT)
-DEBUG= -g
+DEBUG=-g
 
 
 all:main
